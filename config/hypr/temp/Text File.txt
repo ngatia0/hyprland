@@ -1,0 +1,180 @@
+sudo chown $USER:$USER ~/.config/hypr/hyprlock.conf
+sudo chown -R $USER:$USER ~/.config/hypr
+
+hyprpicker
+hyprlauncher ~/.config/hypr/hyprlauncher.conf
+hyprtoolkit ~/.config/hypr/hyprtoolkit.conf
+hyprpaper | GitHub
+hyprpicker | GitHub
+hyprlauncher | GitHub
+hypridle | GitHub
+hyprlock | GitHub
+xdg-desktop-portal-hyprland | GitHub
+hyprsysteminfo | GitHub
+hyprsunset | GitHub
+hyprpolkitagent | GitHub
+hyprland-qt-support | GitHub
+hyprqt6engine | GitHub
+hyprpwcenter | GitHub
+hyprshutdown | GitHub
+Dev Libraries and Toolkits
+hyprtoolkit | GitHub
+hyprcursor | GitHub
+hyprutils | GitHub
+hyprlang | GitHub
+hyprwayland-scanner | GitHub
+aquamarine | GitHub
+hyprgraphics | GitHub
+hyprland-guiutils | GitHub
+gsettings set org.gnome.desktop.interface cursor-theme 'THEME_NAME'
+Put your theme(s) in ~/.local/share/icons or ~/.icons
+https://github.com/hyprwm/hyprcursor
+
+hyprutils
+hyprlang
+hyprwayland-scanner
+aquamarine
+hyprgraphics
+hyprland-guiutils
+
+qt5-wayland
+ qt6-wayland
+
+systemctl --user enable --now waybar.service
+
+
+
+paru -S streamlinkW
+
+
+
+
+Install qt5-wayland and qt6-wayland.
+
+
+Wallpapers
+Launch your wallpaper utility with exec-once =.
+
+hyprpaper
+Straight from our oven, hyprpaper is a wallpaper utility from the Hypr Development team. See its usage and config here.
+
+swaybg
+Great utility if all you want is one simple static wallpaper. Get it here.
+
+wpaperd
+A slightly more advanced wallpaper daemon with automatic wallpaper changing options and other fancy stuff. GitHub.
+
+mpvpaper
+A neat mpv wrapper to play a video as your wallpaper. GitHub.
+
+awww
+An efficient animated wallpaper daemon for Wayland, controlled at runtime, which means you can change wallpapers without even needing to restart. Codeberg
+
+waypaper
+GUI wallpaper manager that allows to visually choose the static or animated wallpapers, and supports swaybg and swww as backends on Wayland. GitHub
+
+wallrizz
+TUI wallpaper manager that allows to visually choose and apply the desktop wallpaper. It supports swww, hyprpaper and more as backend on Wayland. Github
+
+
+
+
+clipse - Utilizes Wayland with wl-clipboard and supports text and images. Accessible via a TUI that can be bound to a floating window in your Hyprland config. Features include custom themes, image/text previews, multi-select, pinned items, auto-paste, sensitive content handlin
+
+HyprTile
+HyprTile is a Mega-Launcher for Hyprland. Tiny in size, easy to use with nifty features like app grid, very flexible per app configuration, integrated music search, notes system, screenshot and screenrecording for full screen or selected area, system monitor, volume control, starfield background and very nice optics. A ton of features still to come. Everything s
+
+
+
+
+
+
+
+
+NetworkManager in GTK
+Automatically Mounting Using udiskie
+Starting method: manual (’exec-once')
+
+USB mass storage devices, like thumb drives, mobile phones, digital cameras, etc. are not mounted automatically to the file system.
+
+Typically, they have to be manually mounted, often using root and umount to do so.
+
+Many popular DEs automatically handle this by using udisks2 wrappers.
+
+udiskie is a udisks2 front-end that allows to manage removable media such as CDs or flash drives from userspace.
+
+Install udiskie via your package manager, or build manually
+
+Head over to your hyprland.conf and add the following line:
+
+exec-once = udiskie
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/etc/sddm.conf
+/usr/share/sddm/themes/
+ sudo chown -R $USER:$USER ~/.config/waybar/
+
+ sudo mv /usr/share/applications/chromium.desktop /usr/share/applications/
+ sudo mv /usr/share/applications/chromium.desktop /usr/share/applications/
+ sudo mv /usr/share/applications/chromium.desktop /usr/share/applications/
+ sudo mv /usr/share/applications/chromium.desktop /usr/share/applications/
+
+ paru -S ungoogled-chromium-bin wallust libnotify inotify-tools
+ sudo pacman -S allacrity thunar oomox qt6ct kvantum vscode-css-languageserver prettier
+ sudo EDITOR=nano visudo
+ pacman -S xdg-desktop-portal-hyprland
+ pacman -S hyprsunset
+ paru -S kate-git
+ sudo pacman -Sy qt6-base qt6-multimedia qt6-wayland qt6-tools
+sudo pacman -S hyprland-qt-support
+~/.config/hypr/application-style.conf
+exec-once = hyprsunset
+systemctl --user enable --now hyprsunset.service
+ systemctl --user enable --now hyprpolkitagent.service
+
+ bindel = ,XF86MonBrightnessDown, exec, hyprctl hyprsunset gamma -10
+bindel = ,XF86MonBrightnessUp, exec, hyprctl hyprsunset gamma +10
+
+ env = QT_QPA_PLATFORMTHEME,qt6ct
+env = QT_STYLE_OVERRIDE,kvantum
+
+#unset QT_STYLE_OVERRIDE
+
+
+
+
+
+
+systemctl --user enable mpd-mpris --now
+
+paru -S timidity++
+paru -S mpd-mpris
+systemctl --user enable mpd-mpris --now
+paru -S mpd mpc ncmpcpp
+paru -S yt-dlp
+systemctl --user start mpd
+systemctl --user enable mpd --now
+
+$$$$$$$$$###################################################################
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+
+

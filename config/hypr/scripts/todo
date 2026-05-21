@@ -1,0 +1,43 @@
+#!/bin/bash
+TODO_FILE="$HOME/.config/hypr/todo_list.txt"
+touch "$TODO_FILE"
+
+case "$1" in
+    add)
+        # Shift away the word 'add'
+        shift
+        # Join all remaining arguments into one string
+        task="$*"
+        if [ -n "$task" ]; then
+            echo "$task" >> "$TODO_FILE"
+            notify-send "Task Added" "$task"
+        else
+            notify-send "Error" "Usage: to-do add <task name>"
+        fi
+        ;;
+
+    remove)
+        if [[ "$2" =~ ^[0-9]+$ ]]; then
+            sed -i "${2}d" "$TODO_FILE"
+            notify-send "Task Removed" "Deleted task #$2"
+        else
+            notify-send "Error" "Usage: to-do remove <number>"
+        fi
+        ;;
+
+    clear)
+        > "$TODO_FILE"
+        notify-send "To-Do List" "All tasks cleared."
+        ;;
+
+    *)
+        # Default: Notify/View (when running 'to-do' or Super+T)
+        if [ ! -s "$TODO_FILE" ]; then
+            notify-send "To-Do List" "Your list is empty."
+        else
+            # Numbers the lines for the notification
+            LIST=$(cat -n "$TODO_FILE")
+            notify-send "Current To-Do List" "$LIST"
+        fi
+        ;;
+esac
