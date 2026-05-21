@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+
 
 SCRIPT_PATH=$(realpath "${BASH_SOURCE[0]}")
 STATE_FILE="$HOME/.install_state"
