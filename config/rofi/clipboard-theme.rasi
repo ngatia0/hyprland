@@ -1,0 +1,86 @@
+/* ROUNDED CLIPBOARD ROFI THEME */
+@theme "~/.config/hypr/wallust/colors-rofi.rasi"
+* {
+    font: "Roboto 12";
+    background-color: transparent;
+    margin: 0px;
+    padding: 0px;
+    spacing: 0px;
+}
+
+window {
+   anchor: north;
+   height: 80%;
+    width: 32%;
+    border-radius: 14px;
+    background-color: transparent;
+    blur: true; /* frosted glass effect */
+    // border-color: @color3;
+    border: 1.2px;
+    border-color: @color8;
+}
+
+mainbox {
+    padding: 16px;
+    background-color: @normal-background;
+
+
+}
+
+inputbar {
+    text-color: @normal-background;
+    background-color: @background;
+    border-radius: 16px;
+    padding: 8px 16px;
+    spacing: 8px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @foreground;
+}
+
+entry {
+    placeholder: "Search clipboard...";
+    placeholder-color: @color8;
+    text-color: @color13;
+}
+
+listview {
+    background-color: transparent;
+    margin: 12px 0 0;
+    lines: 12;       /* number of clipboard items visible */
+    columns: 1;
+    fixed-height: true;
+}
+
+element {
+    padding: 12px 20px;
+    spacing: 12px;
+    border-radius: 16px;
+}
+
+element normal active {
+    text-color: @color5;
+}
+
+element alternate active {
+    text-color: @color13;
+}
+
+element selected normal, element selected active {
+    background-color: transparent;
+    text-color: @color12;
+    border-color: @color5;
+    border: 1px ;
+}
+
+element-icon {
+    size: 1.2em;   /* scaled for wider window */
+    vertical-align: 0.5;
+}
+
+element-text {
+    text-color: @foreground;
+    z-index: 999;
+}

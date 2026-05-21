@@ -1,0 +1,502 @@
+//############################################################################################################################################################################################
+{
+  "position": "top",
+  "layer": "top",
+  "height": 28,
+  "blur": true,
+  //"mod": "dock",
+  //"exclusive": true,
+  //"passthrough": true,
+  //"gtk-layer-shell": true,
+  //"reload_style_on_change": true,
+  //"margin-top": 0,
+  "margin-bottom": 0,
+  //"margin-left": 0,
+  //"margin-right": 0,
+  "spacing": 9, // Gaps between modules (4px)
+  "modules-left": [
+    "custom/updates",
+    "backlight",
+    "pulseaudio",
+    "network",
+    //"bluetooth",
+    "custom/weather",
+    "custom/dns",
+    "tray"
+  ],
+  "modules-center": [
+    "custom/logout",
+    //"mpris",
+    "hyprland/workspaces",
+    "custom/clipvault"
+    //"cava",
+    //"custom/notification"
+  ],
+  "modules-right": [
+    //"custom/launcher",
+    "temperature",
+    "memory",
+    "cpu",
+    "clock"
+  ],
+  //#################################################################################    MODULES LEFT    #######################################################################################
+  "custom/dns": {
+  "max-length": 6,
+    "min-length": 6,
+    "format": "{}",
+    "return-type": "json",
+    "interval": 15,
+    "exec": "~/.config/hypr/scripts/dns-s.sh",
+    "on-click": "foot -e resolvectl status"
+},
+"custom/magic": {
+    "format": "󰒘 {}",
+    "exec": "sudo wg show interfaces | awk '{print $1}'",
+    "interval": 5,
+    "return-type": "string",
+    "tooltip": true,
+    "on-click": "hyprctl dispatch togglespecialworkspace magic"
+},
+  "custom/updates": {
+    "max-length": 8,
+    "min-length": 8,
+    "exec": "/home/$USER/.config/hypr/scripts/pac-updates.sh",
+    "return-type": "json",
+    "format": "󰻀\u00a0\u00a0\u200a{text} {icon}",
+    "format-icons": {
+      "has-updates": "󱍷"
+    },
+    "on-click": "/home/$USER/.config/hypr/scripts/updates-handler.sh",
+    "interval": 600
+  },
+  "network": {
+    "max-length": 10,
+    "min-length": 10,
+    "interface": "wlp1s0",
+    "interval": 1,
+    "format-wifi": "{icon}\u00a0\u00a0\u200a{bandwidthDownBytes}",
+    "format-ethernet": "{icon} ",
+    /* ───── Icons ───── */
+    "format-icons": {
+      "wifi": " ",
+      "ethernet": "󰈀 ",
+      "linked": "",
+      "disconnected": "󰤭  "
+    },
+    "tooltip-format": "Network: <big><b>{essid}</b></big>\nSignal strength: <b>{signaldBm}dBm ({signalStrength}%)</b>\nFrequency: <b>{frequency}MHz</b>\nInterface: <b>{ifname}</b>\nIP: <b>{ipaddr}/{cidr}</b>\nGateway: <b>{gwaddr}</b>\nNetmask: <b>{netmask}</b>",
+    "format-linked": "󰈀 {ifname} (No IP)",
+    "format-disconnected": "󰖪 ",
+    "tooltip-format-disconnected": "Disconnected",
+    //"format-alt": "<span foreground='#99ffdd'> {bandwidthDownBytes}</span> <span foreground='#ffcc66'> {bandwidthUpBytes}</span>",
+    //"on-click-right": "nm-connection-editor",
+    "on-click": "foot -e sh -c 'nmtui'"
+  },
+  "bluetooth": {
+    "max-length": 6,
+    "min-length": 6,
+    "format": "",
+    "format-connected": "󰂱",
+    "format-disabled": "󰂲",
+    "rotate": 0,
+    "format-connected-battery": "{icon}\u00a0\u00a0\u200a{num_connections}",
+    // "format-connected-battery": "{icon} {device_alias}-{device_battery_percentage}%",
+    "format-icons": [
+      "󰥇",
+      "󰤾",
+      "󰤿",
+      "󰥀",
+      "󰥁",
+      "󰥂",
+      "󰥃",
+      "󰥄",
+      "󰥅",
+      "󰥆",
+      "󰥈"
+    ],
+    // "format-device-preference": [ "device1", "device2" ], // preference list deciding the displayed device If this config option is not defined or none of the devices in the list are connected, it will fall back to showing the last connected device.
+    "tooltip-format": "{controller_alias}\n{num_connections} connected",
+    "tooltip-format-connected": "{controller_alias}\n{num_connections} connected\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias}\t{icon} {device_battery_percentage}%"
+  },
+  "backlight": {
+    "max-length": 6,
+    "min-length": 6,
+    // // "device": "acpi_video1",
+    // "max-length": ,
+    // "min-length": ,
+    "format": "{icon}\u00a0\u00a0\u200a{percent}%",
+    "format-icons": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+    //	"on-scroll-up":,
+    //	"on-scroll-down":,
+  },
+  "pulseaudio": {
+    "max-length": 7,
+    "min-length": 7,
+    "format": "{icon}\u00a0\u00a0\u200a{volume}%",
+    "tooltip-format": "{icon} {desc} // {volume}%",
+    "format-muted": "muted 󰝟",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%-",
+    "scroll-step": 5,
+    "on-click-right": "pavucontrol-qt"
+  },
+  "custom/weather": {
+    "max-length": 7,
+    "min-length": 7,
+    "exec": "python ~/.config/hypr/scripts/weather.py",
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true,
+    "on-click": "xdg-open https://weather.com/en-IN/weather/today/l/6121c511144d639b3932fe2a28537be31b9be0d714e86f7ca41f69528423c3a8",
+    "interval": 600
+  },
+  "tray": {
+    "icon-size": 18,
+    "spacing": 11,
+     "min-length": 5,
+
+
+  },
+  //########################################################################    MODULESS CENTER    ###########################################################################################
+  "custom/logout": {
+    "max-length": 3,
+    "min-length": 3,
+    "format": "⏻",
+    "on-click": "wlogout"
+  },
+  "idle_inhibitor": {
+    "max-length": 3,
+    "min-length": 3,
+    "format": "{icon}",
+    "rotate": 0,
+    "format-icons": {
+      "activated": "󰥔",
+      "deactivated": ""
+    }
+  },
+  "cava": {
+    // "cava_config": "$XDG_CONFIG_HOME/cava/cava.conf",
+    "framerate": 60,
+    "bar_spacing": 5,
+    "overshoot": 20,
+    "mode": "wave",
+    "monstercat": true,
+    "autosens": 0.6,
+    "sensitivity": 100,
+    "bars": 16,
+    "lower_cutoff_freq": 1,
+    "higher_cutoff_freq": 10000,
+    "hide_on_silence": true,
+    // "format_silent": "quiet",
+    "method": "pulse",
+    "source": "auto",
+    "stereo": true,
+    "reverse": false,
+    "bar_delimiter": 0,
+    "waves": false,
+    "noise_reduction": 0.77,
+    "input_delay": 1,
+    "format-icons": [
+      "▁",
+      "▂",
+      "▃",
+      "▄",
+      "▅",
+      "▆",
+      "▇",
+      "█"
+    ],
+    "actions": {
+      "on-click-right": "mode"
+    }
+  },
+  "mpris": {
+    "max-length": 0,
+    "min-length": 0,
+    "players": [
+      "all"
+    ],
+    "format": "{player_icon}\u00a0\u00a0\u200a{title} {artist}",
+    "format-paused": "{status_icon} <i>{title} {artist}</i>",
+    "player-icons": {
+      "default": "",
+      "spotify": "󰓇",
+      "haruna": "󰨜",
+      "mpv": "",
+      "vlc": "󰕼",
+      "google-chrome-beta": "",
+      "google": "",
+      "google-chrome": "",
+      "chromium": "",
+      "firefox": "",
+      "youtube": "",
+      "tiktok": "",
+      "telegram-desktop": "",
+      "discord": ""
+    },
+    "status-icons": {
+      "paused": "⏸"
+    },
+    "icon-padding": 2,
+    "on-click": "playerctl play-pause",
+    "on-click-middle": "playerctl previous",
+    "on-click-right": "playerctl next",
+    "tooltip": true
+  },
+  "hyprland/workspaces": {
+    "format": "{name}",
+    "format-icons": {
+      "active": "",
+      "default": "",
+      "empty": ""
+    },
+    "persistent-workspaces": {
+      "*": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  },
+    "custom/clipvault": {
+    "max-length": 3,
+    "min-length": 3,
+    "format": "{}󰆒",
+    "tooltip": false,
+    "on-click": "clipvault list | rofi -dmenu -matching fuzzy -columns 2 -theme ~/.config/rofi/clipboard.rasi| clipvault get | wl-copy
+    ",
+    "on-click-right": "foot sh -c 'nano ~/waybar_notes.txt'"
+    //"on-click-right": "wtype -k escape"
+  },
+  "custom/notification": {
+    "max-length": 3,
+    "min-length": 3,
+    "tooltip": false,
+    "format": "{icon}",
+    "format-icons": {
+      "notification": "<span foreground='red'><sup></sup></span>",
+      "none": "",
+      "dnd-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-none": "",
+      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "inhibited-none": "",
+      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-inhibited-none": ""
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  },
+  //##########################################################################################    MODULE RIGHT    ############################################################################
+  // Modules configuration
+  "custom/launcher": {
+    "max-length": 6,
+    "min-length": 6,
+    "format": "",
+    "on-click": "rofi -show drun -show-icons -matching fuzzy -theme /home/$USER/.config/rofi/quickapps.rasi",
+    "tooltip": false
+},
+  "temperature": {
+    "max-length": 7,
+    "min-length": 7,
+    //"thermal-zone": 2,
+    //"hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
+    "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
+    "input-filename": "temp1_input",
+    "interval": 1,
+    "critical-threshold": 52,
+    // "format-critical": "{temperatureC}°C {icon}",
+    "format": "{icon}\u00a0\u00a0\u200a{temperatureC}°C ",
+    "format-icons": [
+      "",
+      "",
+      ""
+    ]
+  },
+  "memory": {
+    "max-length": 6,
+    "min-length": 6,
+        "critical-threshold": 52,
+
+    "states": {
+      "c": 90, // critical
+      "h": 60, // high
+      "m": 30 // medium
+    },
+    "interval": 30,
+    "format": "󰾆\u00a0\u00a0\u200a{}%",
+    "rotate": 0,
+    "format-m": "󰾅\u00a0\u00a0\u200a{}%",
+    "format-h": "󰓅\u00a0\u00a0\u200a{}%",
+    "format-c": "\u00a0\u00a0\u200a{}%",
+    "format-alt": "󰾆\u00a0\u00a0\u200a{percentage}%",
+    "tooltip": true,
+    "tooltip-format": "󰾆 {percentage}%\n {used:0.1f}GB/{total:0.1f}GB"
+  },
+  "cpu": {
+    "max-length": 6,
+    "min-length": 6,
+    "format": "󰻠\u00a0\u00a0\u200a{usage}%",
+    "rotate": 0,
+    "format-alt": "{icon0}{icon1}{icon2}{icon3}",
+    "format-icons": [
+      "▁",
+      "▂",
+      "▃",
+      "▄",
+      "▅",
+      "▆",
+      "▇",
+      "█"
+    ],
+    "interval": 2,
+    "on-click-right": "kitty btop"
+  },
+  "battery": {
+    "max-length": 6,
+    "min-length": 6,
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 15
+    },
+    "format": "{icon}\u00a0\u00a0\u200a{capacity}%",
+    "format-charging": "󰂄\u00a0\u00a0\u200a{capacity}% ",
+    "format-plugged": "\u00a0\u00a0\u200a{capacity}% ",
+    "format-alt": "{icon}",
+    // "format-good": "", // An empty format will hide the module
+    // "format-full": "",
+    "format-icons": [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "clock": {
+    "max-length": 8,
+    "min-length": 8,
+    "format": "\u00a0\u00a0\u200a{:%H:%M}",
+    "rotate": 0,
+    "format-alt": "{:%R 󰃭 %d·%m·%y}",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "on-scroll": 1,
+      "on-click-right": "mode",
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b>{}</b></span>"
+      }
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-click-forward": "tz_up",
+      "on-click-backward": "tz_down",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    },
+    "tooltip": "true",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+  },
+  // ##############################################################################################################################################################################################
+
+  "custom/playerctl": {
+    "format": "{icon}",
+    "return-type": "json",
+    "max-length": 64,
+    "exec": "playerctl -a metadata --format '{\"text\": \"{{artist}} - {{markup_escape(title)}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
+    "on-click-middle": "playerctl next",
+    "on-click": "playerctl pause",
+    "on-click-right": "playerctl previous",
+    "format-icons": {
+      "Playing": "<span foreground='#E5B9C6'>󰒮 󰐌 󰒭</span>",
+      "Paused": "<span foreground='#928374'>󰒮 󰏥 󰒭</span>"
+    }
+  },
+  "custom/playerlabel": {
+    "format": "<span>{}</span>",
+    "return-type": "json",
+    "max-length": 20,
+    "exec": "playerctl -a metadata --format '{\"text\": \"{{artist}} - {{markup_escape(title)}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
+    "format-icons": {
+      "Playing": "<span foreground='#E5B9C6'>󰒮 󰐌 󰒭</span>",
+      "Paused": "<span foreground='#928374'>󰒮 󰏥 󰒭</span>",
+      "default": "",
+      "spotify": "󰓇",
+      "haruna": "󰨜",
+      "mpv": "",
+      "vlc": "󰕼",
+      "google-chrome-beta": "",
+      "google": "",
+      "google-chrome": "",
+      "chromium": "",
+      "firefox": "",
+      "youtube": "",
+      "tiktok": "",
+      "telegram-desktop": "",
+      "discord": ""
+    }
+  },
+  "disk": {
+    "format": "󰋊 {}%",
+    "format-alt": "󰋊 {used}/{total} GiB",
+    "interval": 5,
+    "path": "/mnt/Datos"
+  },
+  "custom/randwall": {
+    "format": "󰏘",
+    "on-click": "bash $HOME/.config/hypr/randwall.sh",
+    "on-click-right": "bash $HOME/.config/hypr/wall.sh"
+  },
+  "custom/wf-recorder": {
+    "format": "{󰹑}",
+    "interval": "once",
+    "exec": "echo ''",
+    "tooltip": "true",
+    "exec-if": "pgrep 'wf-recorder'",
+    "on-click": "exec ./scripts/wlrecord.sh",
+    "signal": 8
+  },
+  "custom/hyprpicker": {
+    "format": "󰈋",
+    "on-click": "hyprpicker -a -f hex",
+    "on-click-right": "hyprpicker -a -f rgb"
+  },
+  "custom/screenshot": {
+    "format": "󱣵",
+    "on-click": "grimblast copy area",
+    "on-click-right": "grimblast save area"
+  }
+}
