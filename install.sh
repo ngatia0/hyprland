@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -e
+
+SCRIPT_PATH=$(realpath "${BASH_SOURCE[0]}")
+STATE_FILE="$HOME/.install_state"
+CURRENT_STATE=$(cat "$STATE_FILE" 2>/dev/null || echo "1")
+
+if [ "$CURRENT_STATE" = "1" ]; then
+
+
+sudo pacman -S --needed --noconfirm base-devel git
+
+git clone https://github.com/ngatia0/etc.git
+cd ~/etc
+sudo cp -r makepkg.conf /etc/
+sudo cp -r makepkg.conf.d /etc/
+cd ~
+
+# 0. Clone configuration
+mkdir -p ~/.config
+git clone https://github.com/ngatia0/temp2.git ~/temp_cfg
+cp -rn ~/temp_cfg/* ~/.config/
+rm -rf ~/temp_cfg
+
+cd ~
+
+mkdir -p ~/.config/paru
+cd  ~/.config/paru/
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+paru -Syyu
+cd ~
+
+paru -S --needed --noconfirm wayland-git
+paru -S --needed --noconfirm wayland-protocols-git
+paru -S --needed --noconfirm hyprlang-git
+
+(reboot here)
+
+
+paru -S hyprland-guiutils-git
+paru -S xdg-desktop-portal-hyprland-git
+paru -S hyprpolkitagent-git
+paru -S --needed --noconfirm hyprutils-git
+
+
+cd ~/.config/paru/
+git clone https://github.com/bus1/dbus-broker.git
+cd dbus-broker
+meson setup build
+meson compile -C build
+meson test -C build
+meson install -C build
+sudo systemctl enable dbus-broker.service
+cd ~
+
+paru -S mesa-git
+paru -S libva-intel-driver-git
+paru -S libva-utils-git
+paru -S intel-media-driver-git
+
+
+chmod +x /home/kvnx/hyprland-de/ffmpeg-depen.sh
+/home/kvnx/hyprland-de/ffmpeg-depen.sh
+cd ~
+
+echo "Have you installed ffmpeg zst ?"
+( this is for gemini add a question here if i answer y yes continue with the script)
+
+
+(reboot here)
+
+paru -S --needed --noconfirm hyprwayland-scanner-git
+paru -S --needed --noconfirm aquamarine-git
+paru -S --needed --noconfirm hyprgraphics-git
+
+
+sudo pacman -S pipewire
+sudo pacman -S wireplumber
+sudo pacman -S pipewire-pulse
+sudo pacman -S pipewire-alsa
+sudo pacman -S pipewire-jack
+sudo pacman -S pavucontrol-qt
+sudo pacman -S rtkit
+sudo pacman -S libnotify inotify-tools
+
+
+sudo systemctl enable --now rtkit-daemon
+systemctl --user enable --now pipewire pipewire-pulse wireplumber
+
+
+paru -S clipvault
+paru -S hyprlock-git
+paru -S hyprpaper-git
+paru -S hyprland-qt-support-git
+paru -S --needed --noconfirm hyprcursor-git
+paru -S waybar-git --mflags "--nocheck"
+paru -S hyprland-guiutils-git
+
+(reboot here)
+
+paru -S --needed --noconfirm hyprland-git
+
+(reboot here)
+paru -S dunst-git
+paru -S wallust wireguard-tools-git
+paru -S  blueman
+paru -S telegram-desktop
+paru -S --needed --noconfirm google-chrome-beta
+
+
+paru -S --needed --noconfirm hyprland-git
+
+
+paru -S hyprpolkitagent-git
+paru -S lsp-plugins-lv2
+paru -S i8kutils-git
+
+
+
+paru -S network-manager-applet
+paru -S  blueman
+paru -S telegram-desktop
+paru -S foot thunar dolphin
+
+
+echo ":: Installing Google Chrome..."
+paru -S --needed --noconfirm google-chrome-beta
+
