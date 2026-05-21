@@ -1,2 +1,2 @@
 # hyprland
-my hprland de dotfile
+arch install 💻 + hyprland 💧 de dotfile
