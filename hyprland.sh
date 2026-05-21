@@ -10,18 +10,17 @@ if [ "$CURRENT_STATE" = "1" ]; then
 
 sudo pacman -S --needed --noconfirm base-devel git
 
-git clone https://github.com/ngatia0/etc.git
-cd ~/etc
+git clone https://github.com/ngatia0/hyprland.git
+cd ~/hyprland/etc
 sudo cp -r makepkg.conf /etc/
 sudo cp -r makepkg.conf.d /etc/
 cd ~
 
 # 0. Clone configuration
 mkdir -p ~/.config
-git clone https://github.com/ngatia0/temp2.git ~/temp_cfg
-cp -rn ~/temp_cfg/* ~/.config/
-rm -rf ~/temp_cfg
+mkdir -p ~/.config/paru
 
+cp -rn ~/hyprland/config/* ~/.config/
 cd ~
 
 mkdir -p ~/.config/paru
@@ -36,7 +35,10 @@ paru -S --needed --noconfirm wayland-git
 paru -S --needed --noconfirm wayland-protocols-git
 paru -S --needed --noconfirm hyprlang-git
 
-(reboot here)
+  echo "2" > "$STATE_FILE"
+  sudo reboot
+fi
+if [ "$CURRENT_STATE" = "2" ]; then
 
 
 paru -S hyprland-guiutils-git
@@ -66,10 +68,17 @@ chmod +x /home/kvnx/hyprland-de/ffmpeg-depen.sh
 cd ~
 
 echo "Have you installed ffmpeg zst ?"
-( this is for gemini add a question here if i answer y yes continue with the script)
+read -p "Answer (y/n): " answer
+if [[ "$answer" != [Yy]* ]]; then
+  echo "Exiting. Please install ffmpeg zst and rerun the script."
+  exit 1
+fi
 
 
-(reboot here)
+  echo "3" > "$STATE_FILE"
+  sudo reboot
+fi
+if [ "$CURRENT_STATE" = "3" ]; then
 
 paru -S --needed --noconfirm hyprwayland-scanner-git
 paru -S --needed --noconfirm aquamarine-git
@@ -98,11 +107,17 @@ paru -S --needed --noconfirm hyprcursor-git
 paru -S waybar-git --mflags "--nocheck"
 paru -S hyprland-guiutils-git
 
-(reboot here)
+  echo "4" > "$STATE_FILE"
+  sudo reboot
+fi
+if [ "$CURRENT_STATE" = "4" ]; then
 
 paru -S --needed --noconfirm hyprland-git
 
-(reboot here)
+  echo "5" > "$STATE_FILE"
+  sudo reboot
+fi
+if [ "$CURRENT_STATE" = "5" ]; then
 paru -S dunst-git
 paru -S wallust wireguard-tools-git
 paru -S  blueman
@@ -127,4 +142,3 @@ paru -S foot thunar dolphin
 
 echo ":: Installing Google Chrome..."
 paru -S --needed --noconfirm google-chrome-beta
-
