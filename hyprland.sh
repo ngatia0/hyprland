@@ -47,6 +47,15 @@ paru -S hyprpolkitagent-git
 paru -S --needed --noconfirm hyprutils-git
 
 
+paru -S mesa-git
+paru -S libva-intel-driver-git
+paru -S libva-utils-git
+paru -S intel-media-driver-git
+
+chmod +x hyprland/dependencies.sh
+~/hyprland/dependencies.sh
+
+
 cd ~/.config/paru/
 git clone https://github.com/bus1/dbus-broker.git
 cd dbus-broker
@@ -55,16 +64,6 @@ meson compile -C build
 meson test -C build
 meson install -C build
 sudo systemctl enable dbus-broker.service
-cd ~
-
-paru -S mesa-git
-paru -S libva-intel-driver-git
-paru -S libva-utils-git
-paru -S intel-media-driver-git
-
-
-chmod +x /home/kvnx/hyprland-de/ffmpeg-depen.sh
-/home/kvnx/hyprland-de/ffmpeg-depen.sh
 cd ~
 
 echo "Have you installed ffmpeg zst ?"
