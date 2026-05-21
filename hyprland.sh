@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e
 
 SCRIPT_PATH=$(realpath "${BASH_SOURCE[0]}")
 STATE_FILE="$HOME/.install_state"
@@ -7,8 +7,8 @@ CURRENT_STATE=$(cat "$STATE_FILE" 2>/dev/null || echo "1")
 
 if [ "$CURRENT_STATE" = "1" ]; then
 
-
-sudo pacman -S --needed --noconfirm base-devel git
+# Fixed: package name changed to zram-generator for Arch Linux
+sudo pacman -S --needed --noconfirm base-devel git zram-generator
 
 git clone https://github.com/ngatia0/hyprland.git
 cd ~/hyprland/etc
@@ -24,16 +24,26 @@ cp -rn ~/hyprland/config/* ~/.config/
 cd ~
 
 mkdir -p ~/.config/paru
-cd  ~/.config/paru/
+cd ~/.config/paru/
 git clone https://aur.archlinux.org/paru.git
 cd paru
-makepkg -si
-paru -Syyu
+makepkg -si --noconfirm
+paru -Syyu --noconfirm
 cd ~
 
 paru -S --needed --noconfirm wayland-git
 paru -S --needed --noconfirm wayland-protocols-git
 paru -S --needed --noconfirm hyprlang-git
+
+  # Write zram configuration before rebooting so it is active for heavy git compiling in State 2
+  sudo mkdir -p /etc/systemd
+  sudo tee /etc/systemd/zram-generator.conf << 'EOT'
+[zram0]
+zram-size = 55076
+compression-algorithm = lz4
+swap-priority = 100
+fs-type = swap
+EOT
 
   echo "2" > "$STATE_FILE"
   sudo reboot
@@ -41,29 +51,31 @@ fi
 if [ "$CURRENT_STATE" = "2" ]; then
 
 
-paru -S hyprland-guiutils-git
-paru -S xdg-desktop-portal-hyprland-git
-paru -S hyprpolkitagent-git
+paru -S --needed --noconfirm hyprland-guiutils-git
+paru -S --needed --noconfirm xdg-desktop-portal-hyprland-git
+paru -S --needed --noconfirm hyprpolkitagent-git
 paru -S --needed --noconfirm hyprutils-git
-
-
-paru -S mesa-git
-paru -S libva-intel-driver-git
-paru -S libva-utils-git
-paru -S intel-media-driver-git
-
-chmod +x hyprland/dependencies.sh
-~/hyprland/dependencies.sh
 
 
 cd ~/.config/paru/
 git clone https://github.com/bus1/dbus-broker.git
 cd dbus-broker
+sudo pacman -S --needed --noconfirm meson
 meson setup build
 meson compile -C build
 meson test -C build
-meson install -C build
+sudo meson install -C build
 sudo systemctl enable dbus-broker.service
+cd ~
+
+paru -S --needed --noconfirm mesa-git
+paru -S --needed --noconfirm libva-intel-driver-git
+paru -S --needed --noconfirm libva-utils-git
+paru -S --needed --noconfirm intel-media-driver-git
+
+
+chmod +x /home/kvnx/hyprland-de/ffmpeg-depen.sh
+/home/kvnx/hyprland-de/ffmpeg-depen.sh
 cd ~
 
 echo "Have you installed ffmpeg zst ?"
@@ -84,27 +96,16 @@ paru -S --needed --noconfirm aquamarine-git
 paru -S --needed --noconfirm hyprgraphics-git
 
 
-sudo pacman -S pipewire
-sudo pacman -S wireplumber
-sudo pacman -S pipewire-pulse
-sudo pacman -S pipewire-alsa
-sudo pacman -S pipewire-jack
-sudo pacman -S pavucontrol-qt
-sudo pacman -S rtkit
-sudo pacman -S libnotify inotify-tools
+sudo pacman -S --needed --noconfirm pipewire wireplumber pipewire-pulse pipewire-alsa pipewire-jack pavucontrol-qt rtkit libnotify inotify-tools
 
 
 sudo systemctl enable --now rtkit-daemon
 systemctl --user enable --now pipewire pipewire-pulse wireplumber
 
 
-paru -S clipvault
-paru -S hyprlock-git
-paru -S hyprpaper-git
-paru -S hyprland-qt-support-git
-paru -S --needed --noconfirm hyprcursor-git
-paru -S waybar-git --mflags "--nocheck"
-paru -S hyprland-guiutils-git
+paru -S --needed --noconfirm clipvault hyprlock-git hyprpaper-git hyprland-qt-support-git hyprcursor-git
+paru -S --needed --noconfirm waybar-git --mflags "--nocheck"
+paru -S --needed --noconfirm hyprland-guiutils-git
 
   echo "4" > "$STATE_FILE"
   sudo reboot
@@ -117,27 +118,34 @@ paru -S --needed --noconfirm hyprland-git
   sudo reboot
 fi
 if [ "$CURRENT_STATE" = "5" ]; then
-paru -S dunst-git
-paru -S wallust wireguard-tools-git
-paru -S  blueman
-paru -S telegram-desktop
-paru -S --needed --noconfirm google-chrome-beta
 
+paru -S --needed --noconfirm dunst-git wallust wireguard-tools-git blueman telegram-desktop google-chrome-beta lsp-plugins-lv2 i8kutils-git network-manager-applet foot thunar dolphin
 
-paru -S --needed --noconfirm hyprland-git
+  # Write i8kmon configuration and enable its daemon service
+  sudo mkdir -p /etc/i8kutils
+  sudo tee /etc/i8kutils/i8kmon.conf << 'EOT'
+# Status check timeout (seconds), override with --timeout option
+set config(timeout)     2
 
+# Temperature threshold at which the temperature is displayed in red
+set config(t_high)      80
 
-paru -S hyprpolkitagent-git
-paru -S lsp-plugins-lv2
-paru -S i8kutils-git
+# Number of temperature configurations
+set config(num_configs)  3
 
+# Temperature thresholds: {fan_speeds low_ac high_ac low_batt high_batt}
 
+set config(0)   {{0 0}  -1  45  -1  45}
+set config(1)   {{1 0}  44  55  44  55}
+set config(2)   {{2 0}  50 128  50 128}
 
-paru -S network-manager-applet
-paru -S  blueman
-paru -S telegram-desktop
-paru -S foot thunar dolphin
+# Speed values are set here to avoid i8kmon probe them at every time it starts.
+set status(leftspeed)   "0 2500 5000 5000"
+set status(rightspeed)  "0 2500 5000 5000"
+EOT
 
+  sudo systemctl enable i8kmon.service
 
-echo ":: Installing Google Chrome..."
-paru -S --needed --noconfirm google-chrome-beta
+rm -f "$STATE_FILE"
+echo ":: System configuration setup fully complete!"
+fi
