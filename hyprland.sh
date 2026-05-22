@@ -7,8 +7,7 @@ CURRENT_STATE=$(cat "$STATE_FILE" 2>/dev/null || echo "1")
 
 if [ "$CURRENT_STATE" = "1" ]; then
 
-# Fixed: package name changed to zram-generator for Arch Linux
-sudo pacman -S --needed --noconfirm base-devel git zram-generator
+sudo pacman -S --needed --noconfirm base-devel git
 
 git clone https://github.com/ngatia0/hyprland.git
 cd ~/hyprland/etc
@@ -34,16 +33,6 @@ cd ~
 paru -S --needed --noconfirm wayland-git
 paru -S --needed --noconfirm wayland-protocols-git
 paru -S --needed --noconfirm hyprlang-git
-
-  # Write zram configuration before rebooting so it is active for heavy git compiling in State 2
-  sudo mkdir -p /etc/systemd
-  sudo tee /etc/systemd/zram-generator.conf << 'EOT'
-[zram0]
-zram-size = 55076
-compression-algorithm = lz4
-swap-priority = 100
-fs-type = swap
-EOT
 
   echo "2" > "$STATE_FILE"
   sudo reboot
