@@ -5,6 +5,8 @@ USERNAME="kvnx"
 HOSTNAME="archiso"
 DISK="/dev/sda"
 
+
+
 if [[ "$DISK" == *nvme* ]]; then
   BOOT_DEV="${DISK}p1"
   ROOT_DEV="${DISK}p2"
@@ -14,6 +16,9 @@ else
 fi
 
 echo "== Starting Arch Linux Installation for $USERNAME =="
+
+sudo reflector --country 'South Africa,Keny
+a' --latest 5 --protocol https --sort rate --download-timeout 3 --save /mnt/etc/pacman.d/mirrorlist && pacman -Sy
 
 pacman -Sy --needed --noconfirm efibootmgr networkmanager f2fs-tools dosfstools
 cfdisk "$DISK"
@@ -26,7 +31,7 @@ mount -t f2fs -o rw,noatime,lazytime,background_gc=on,atgc,gc_merge,discard,disc
 mkdir -p /mnt/boot
 mount "$BOOT_DEV" /mnt/boot
 
-pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware f2fs-tools intel-ucode git nano networkmanager sudo efibootmgr
+pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware f2fs-tools intel-ucode git nano networkmanager sudo efibootmgr reflector
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -60,6 +65,15 @@ echo "Set root password:"
 passwd
 
 EDITOR=nano visudo
+
+sudo mkdir -p /etc/systemd
+  sudo tee /etc/systemd/zram-generator.conf << 'EOT'
+[zram0]
+zram-size = 55076
+compression-algorithm = lz4
+swap-priority = 100
+fs-type = swap
+EOT
 
 bootctl install --esp-path=/boot
 
