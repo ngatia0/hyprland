@@ -1,169 +1,129 @@
+
 #!/bin/bash
+
+# Minimalist Artix Linux Install Script (No Encryption, Suckless Philosophy)
+
+# If not running as root, re-execute as root using su
 if [ "$EUID" -ne 0 ]; then
+  echo "[!] Not running as root. Asking for root password..."
   exec su -c "bash '$0'"
 fi
 
 set -e
 
-ping -c 1 artixlinux.org >/dev/null 2>&1 || {
-    connmanctl
+echo "[+] Running as root. Continuing..."
+
+echo "[+] Checking internet connection..."
+ping -c 1 archlinux.org >/dev/null 2>&1 || {
+    echo "[!] No internet. Launching connmanctl to connect WiFi..."
+    nmtui
 }
 
+echo "[+] Internet connected."
+
+# Disk selection
 lsblk -d -e 7,11 -o NAME,SIZE,MODEL
-read -p "[?] Enter target disk: " DISK
-[[ "$DISK" != /dev/* ]] && DISK="/dev/$DISK"
-[ ! -b "$DISK" ] && exit 1
+read -p "[?] Enter your target disk (e.g., /dev/nvme0n1, /dev/sda, /dev/vda): " DISK
+[ ! -b "$DISK" ] && echo "[!] Invalid disk." && exit 1
 
-cfdisk "$DISK"
+echo "[!] Partitioning $DISK (EFI: 400M, Root: 128G, Home: remaining)"
+read -p "    Press Enter to launch cfdisk..." _ && cfdisk "$DISK"
 
-P=; [[ "$DISK" == *"nvme"* || "$DISK" == *"mmcblk"* ]] && P="p"
-EFI_DEV="${DISK}${P}1"
-BOOT_DEV="${DISK}${P}2"
-ROOT_DEV="${DISK}${P}3"
+# Handle partition suffix (p for nvme)
+P=; [[ "$DISK" == *"nvme"* ]] && P="p"
+EFI="${DISK}${P}1"
+ROOT="${DISK}${P}2"
 
-mkfs.fat -F 32 -n UEFI "$EFI_DEV"
-mkfs.ext4 -F -L BOOT "$BOOT_DEV"
-mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,inode_crtime,sb_checksum,compression "$ROOT_DEV"
+sudo pacman -Sy f2fs-tools dosfstools
 
-mount -t f2fs -o rw,noatime,background_gc=sync,gc_merge,discard,discard_unit=block,flush_merge,extent_cache,age_extent_cache,alloc_mode=default,checkpoint_merge,compress_algorithm=lz4:3,compress_chksum,atgc,errors=remount-ro,lookup_mode=auto,lazytime,inline_xattr "$ROOT_DEV" /mnt
+echo "[+] Formatting partitions..."
+mkfs.fat -F32 "$EFI"
+mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,inode_crtime,sb_checksum,compression "$ROOT"
 
-mkdir -p /mnt/boot
-mount "$BOOT_DEV" /mnt/boot
+echo "[+] Mounting filesystems..."
 
-mkdir -p /mnt/efi
-mount "$EFI_DEV" /mnt/efi
+mount -t f2fs -o rw,noatime,background_gc=sync,gc_merge,discard,\
+discard_unit=block,flush_merge,extent_cache,age_extent_cache,\
+alloc_mode=default,checkpoint_merge,compress_algorithm=lz4:3,\
+compress_chksum,atgc,errors=remount-ro,lookup_mode=auto,lazytime,\
+inline_xattr "$ROOT" /mnt
 
-basestrap -i /mnt base base-devel linux-zen linux-zen-headers linux-firmware f2fs-tools intel-ucode git vim networkmanager networkmanager-runit runit runit-rc elogind elogind-runit efibootmgr bash-completion nano sudo
+mkdir -p /mnt/boot/efi
+mount "$EFI" /mnt/boot/efi
+
+# Base install
+echo "[+] Installing base system..."
+basestrap -i /mnt base base-devel linux linux-firmware grub \
+  networkmanager networkmanager-runit runit elogind-runit git \
+  efibootmgr bash-completion sudo runit-rc intel-ucode f2fs-tools dosfstools
 
 fstabgen -U /mnt >> /mnt/etc/fstab
 
-cat > /mnt/setup.sh << 'EOF'
+# Get user info
+read -s -p "[?] Enter root password: " ROOTPASS && echo
+read -p "[?] Enter new username: " USERNAME
+read -s -p "[?] Enter password for user '$USERNAME': " USERPASS && echo
+
+# Write chroot config script
+cat > /mnt/setup_inside_chroot.sh <<EOF
 #!/bin/bash
 set -e
 
-USERNAME="kvnx"
-HOSTNAME="archiso"
-
-ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
-hwclock --systohc
-
-pacman -Sy --noconfirm
 pacman -S --noconfirm artix-archlinux-support
 pacman-key --populate archlinux
 pacman -S --noconfirm archlinux-mirrorlist
 echo -e "\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch" >> /etc/pacman.conf
 pacman -Sy --noconfirm
 
-sed -i '/en_GB.UTF-8 UTF-8/s/^#//' /etc/locale.gen
+ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
+hwclock --systohc
+
+sed -i '/en_US.UTF-8 UTF-8/s/^#//' /etc/locale.gen
 locale-gen
-echo "LANG=en_GB.UTF-8" > /etc/locale.conf
-echo "KEYMAP=us" > /etc/vconsole.conf
-echo "$HOSTNAME" > /etc/hostname
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
-cat <<EOH > /etc/hosts
-127.0.0.1   localhost
-::1         localhost
-127.0.1.1   $HOSTNAME.localdomain $HOSTNAME
-EOH
+echo "archiso" > /etc/hostname
+cat <<EOL > /etc/hosts
+127.0.0.1       localhost
+::1             localhost
+127.0.1.1       archiso.localdomain archiso
+EOL
 
-echo "[+] Set root password:"
-passwd
+echo "[+] Setting root password..."
+echo "root:$ROOTPASS" | chpasswd
 
-useradd -m -G wheel,audio,video -s /bin/bash "$USERNAME"
-echo "[+] Set password for $USERNAME:"
-passwd "$USERNAME"
+echo "[+] Creating user '$USERNAME'..."
+useradd -m -G wheel "$USERNAME"
+echo "$USERNAME:$USERPASS" | chpasswd
 
-echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/10-wheel
+echo "[+] Enabling sudo for wheel group..."
+sed -i 's/^# %wheel/%wheel/' /etc/sudoers
 
-cat <<EOT > /etc/mkinitcpio.conf
-MODULES=(f2fs i915)
-BINARIES=()
-FILES=()
-HOOKS=(base udev autodetect modconf kms keyboard keymap block filesystems fsck)
-EOT
+sudo EDITOR=nano visudo
+echo "[+] Installing fonts..."
+pacman -S --noconfirm ttf-hack ttf-hack-nerd
 
-mkinitcpio -P
+echo "[+] Installing liked packages..."
+pacman -S --noconfirm neofetch
 
-chmod 755 /var/lib/pacman /var/lib/pacman/local
-find /var/lib/pacman/local -type d -exec chmod 755 {} +
-find /var/lib/pacman/local -type f -exec chmod 644 {} +
+echo "[+] Installing GRUB bootloader..."
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+grub-mkconfig -o /boot/grub/grub.cfg
 
-sudo -u "$USERNAME" bash -c "
-  cd /tmp
-  git clone https://aur.archlinux.org/nosystemd-boot-artix.git
-  cd nosystemd-boot-artix
-  makepkg -si --noconfirm
-"
-
-echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/10-wheel
-
-bootctl --esp-path=/efi --boot-path=/boot install
-
-mkdir -p /boot/loader/entries
-
-cat << EOT > /boot/loader/loader.conf
-default zen.conf
-timeout 3
-console-mode max
-editor no
-EOT
-
-ROOT_UUID=$(blkid -t LABEL=ROOT -s UUID -o value)
-
-cat << EOT > /boot/loader/entries/linux.conf
-title   Linux
-linux   /vmlinuz-linux
-initrd  /intel-ucode.img
-initrd  /initramfs-linux.img
-options root=UUID=$ROOT_UUID rw rootfstype=f2fs quiet
-EOT
-
-cat << EOT > /boot/loader/entries/zen.conf
-title   Zen
-linux   /vmlinuz-linux-zen
-initrd  /intel-ucode.img
-initrd  /initramfs-linux-zen.img
-options root=UUID=$ROOT_UUID rw rootfstype=f2fs quiet
-EOT
-
-cat << EOT > /boot/loader/entries/cachyos.conf
-title   Cachyos
-linux   /vmlinuz-linux-cachyos
-initrd  /intel-ucode.img
-initrd  /initramfs-linux-cachyos.img
-options root=UUID=$ROOT_UUID rw rootfstype=f2fs quiet
-EOT
-
-cat << EOT > /boot/loader/entries/bore-lto.conf
-title   BORE
-linux   /vmlinuz-linux-cachyos-bore-lto
-initrd  /intel-ucode.img
-initrd  /initramfs-linux-cachyos-bore-lto.img
-options root=UUID=$ROOT_UUID rw rootfstype=f2fs quiet
-EOT
-
-cat << EOT > /boot/loader/entries/bore.conf
-title   Bore
-linux   /vmlinuz-linux-cachyos-bore
-initrd  /intel-ucode.img
-initrd  /initramfs-linux-cachyos-bore.img
-options root=UUID=$ROOT_UUID rw rootfstype=f2fs quiet
-EOT
-
-cat << EOT > /boot/loader/entries/bmq.conf
-title   BMQ
-linux   /vmlinuz-linux-cachyos-bmq-lto
-initrd  /intel-ucode.img
-initrd  /initramfs-linux-cachyos-bmq-lto.img
-options root=UUID=$ROOT_UUID rw rootfstype=f2fs quiet
-EOT
-
-ln -s /etc/runit/sv/NetworkManager /etc/runit/runsvdir/default/
+echo "[✓] Setup complete inside chroot."
 EOF
 
-chmod +x /mnt/setup.sh
-artix-chroot /mnt /setup.sh
-rm /mnt/setup.sh
+chmod +x /mnt/setup_inside_chroot.sh
 
-umount -R /mnt
-echo "[✓] Installation complete with split systemd-boot structures."
+# Run chroot setup
+echo "[+] Entering chroot to complete installation..."
+artix-chroot /mnt /setup_inside_chroot.sh
+
+# Clean up
+rm /mnt/setup_inside_chroot.sh
+
+echo "[✓] Installation complete."
+echo "Exit the live environment and run:"
+echo "umount -R /mnt"
+echo "reboot"
+
