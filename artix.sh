@@ -25,7 +25,7 @@ mkfs.fat -F 32 -n UEFI "$EFI_DEV"
 mkfs.ext4 -F -L BOOT "$BOOT_DEV"
 mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,inode_crtime,sb_checksum,compression "$ROOT_DEV"
 
-mount -t f2fs -o rw,noatime,background_gc=sync,gc_merge,discard,discard_unit=block,flush_merge,extent_cache,age_extent_cache,alloc_mode=default,checkpoint_merge,compress_algorithm=zstd:3,compress_chksum,atgc,errors=remount-ro,lookup_mode=auto,lazytime,inline_xattr "$ROOT_DEV" /mnt
+mount -t f2fs -o rw,noatime,background_gc=sync,gc_merge,discard,discard_unit=block,flush_merge,extent_cache,age_extent_cache,alloc_mode=default,checkpoint_merge,compress_algorithm=lz4:3,compress_chksum,atgc,errors=remount-ro,lookup_mode=auto,lazytime,inline_xattr "$ROOT_DEV" /mnt
 
 mkdir -p /mnt/boot
 mount "$BOOT_DEV" /mnt/boot
