@@ -53,6 +53,13 @@ echo "LANG=en_GB.UTF-8" > /etc/locale.conf
 echo "KEYMAP=us" > /etc/vconsole.conf
 echo "$HOSTNAME" > /etc/hostname
 
+
+sudo pacman -S --noconfirm artix-archlinux-support
+sudo pacman-key --populate archlinux
+sudo pacman -S --noconfirm archlinux-mirrorlist
+sudo bash -c 'echo -e "\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch" >> /etc/pacman.conf'
+sudo pacman -Sy --noconfirm
+
 cat <<EOH > /etc/hosts
 127.0.0.1   localhost
 ::1         localhost
