@@ -47,8 +47,11 @@ fi
 # STATE 2
 if [ "$CURRENT_STATE" = "2" ]; then
 
-    paru -S --needed --noconfirm modprobed-db
-    paru -S --needed --noconfirm hyprland-guiutils-git
+    sudo pacman -S qt6-base qt6-wayland
+    sudo pacman -S qt5-base qt5-wayland
+    paru -S hyprtoolkit-git hyprcursor-git hyprlang-git hyprutils-git --needed --noconfirm
+    paru -S --needed --noconfirm modprobed-db hyprsysteminfo-git udis86-git hyprwire-git 
+    paru -S --needed --noconfirm hyprland-guiutils-git hyprtoolkit-git 
     paru -S --needed --noconfirm xdg-desktop-portal-hyprland-git
     paru -S --needed --noconfirm hyprpolkitagent-git
     paru -S --needed --noconfirm hyprutils-git
