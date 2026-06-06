@@ -46,7 +46,18 @@ fi
 
 # STATE 2
 if [ "$CURRENT_STATE" = "2" ]; then
-    paru -S --needed --noconfirm modprobed-db hyprland-guiutils-git gstreamer xdg-desktop-portal-hyprland-git hyprpolkitagent-git hyprutils-git mesa-git libva-intel-driver-git libva-utils-git intel-media-driver-git
+
+    paru -S --needed --noconfirm modprobed-db
+    paru -S --needed --noconfirm hyprland-guiutils-git
+    paru -S --needed --noconfirm xdg-desktop-portal-hyprland-git
+    paru -S --needed --noconfirm hyprpolkitagent-git
+    paru -S --needed --noconfirm hyprutils-git
+
+    paru -S --needed --noconfirm mesa-git
+    paru -S --needed --noconfirm libva-intel-driver-git
+    paru -S --needed --noconfirm libva-utils-git
+    paru -S --needed --noconfirm intel-media-driver-git
+
 
     chmod +x ~/hyprland/dependencies.sh
     ~/hyprland/dependencies.sh
@@ -64,9 +75,18 @@ fi
 
 # STATE 3
 if [ "$CURRENT_STATE" = "3" ]; then
-    paru -S --needed --noconfirm hyprwayland-scanner-git aquamarine-git hyprgraphics-git
+   paru -S --needed --noconfirm hyprwayland-scanner-git
+   paru -S --needed --noconfirm aquamarine-git
+   paru -S --needed --noconfirm hyprgraphics-git
+
     sudo pacman -S --needed --noconfirm pipewire wireplumber pipewire-pulse pipewire-alsa pipewire-jack pavucontrol-qt rtkit rtkit-runit libnotify inotify-tools
-    paru -S --needed --noconfirm clipvault hyprlock-git hyprpaper-git hyprland-qt-support-git hyprcursor-git waybar-git --mflags "--nocheck" hyprland-guiutils-git
+
+    paru -S --needed --noconfirm clipvault hyprlock-git hyprpaper-git hyprland-qt-support-git hyprcursor-git
+
+    paru -S --needed --noconfirm waybar-git --mflags "--nocheck"
+
+    paru -S --needed --noconfirm hyprland-guiutils-git
+
     echo "4" > "$STATE_FILE"
     sudo reboot
 fi
