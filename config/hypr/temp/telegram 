@@ -1,0 +1,6 @@
+adb shell pm revoke org.telegram.messenger android.permission.ACCESS_FINE_LOCATION
+adb shell pm revoke org.telegram.messenger android.permission.ACCESS_COARSE_LOCATION
+adb shell pm revoke org.telegram.messenger android.permission.NEARBY_WIFI_DEVICES
+adb shell pm revoke org.telegram.messenger android.permission.BLUETOOTH_SCAN
+adb shell pm revoke org.telegram.messenger android.permission.READ_PHONE_NUMBERS
+adb shell pm revoke org.telegram.messenger android.permission.READ_PHONE_STATE

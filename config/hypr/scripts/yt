@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Check if URL is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <URL>"
+    exit 1
+fi
+
+URL="$1"
+
+# -f: Requests best MP4 video + best M4A audio
+# --merge-output-format: Ensures the final container is mp4
+# --embed-metadata: Adds video info to the file
+yt-dlp \
+    -f "bv[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv+ba/b" \
+    --merge-output-format mp4 \
+    --embed-metadata \
+    --embed-thumbnail \
+    -o "%(title)s.%(ext)s" \
+    "$URL"

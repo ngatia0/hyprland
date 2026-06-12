@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+# --- CONFIG ---
+CURL_KEY=""
+[ -n "$CURL_KEY" ] && AUTH="?token=$CURL_KEY" || AUTH=""
+
+# --- STYLING ---
+G="\033[1;32m"; C="\033[1;36m"; Y="\033[1;33m"; R="\033[1;31m"
+M="\033[1;35m"; W="\033[1;37m"; RESET="\033[0m"; BOLD="\033[1m"
+
+# --- NOTIFICATION FIX ---
+REAL_UID=$(id -u ${SUDO_USER:-$USER})
+export XDG_RUNTIME_DIR="/run/user/$REAL_UID"
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
+center() {
+  local text="$1"
+  local clean_text=$(echo -e "$text" | sed 's/\x1b\[[0-9;]*m//g')
+  local padding=$(( (72 - ${#clean_text}) / 2 ))
+  printf "%${padding}s%b\n" "" "$text"
+}
+
+# Separated IP fetcher for the comparison
+get_ip() {
+    curl -s --max-time 3 "ipinfo.io/ip${AUTH}"
+}
+
+get_location() {
+    curl -s --max-time 3 "ipinfo.io/city${AUTH}" "ipinfo.io/country${AUTH}" | paste -sd' ' -
+}
+
+clear
+echo -e "\n"
+center "${C}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${RESET}"
+center "${C}┃${RESET}   ${M}${BOLD}󰒘  WIREGUARD NETWORK MANAGER${RESET}    ${C}┃${RESET}"
+center "${C}┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫${RESET}"
+center "${C}┃${RESET}   ${Y}1)${RESET}  Activate ${BOLD}wg0${RESET}                      ${C}┃${RESET}"
+center "${C}┃${RESET}   ${Y}2)${RESET}  Activate ${BOLD}wg1${RESET}                      ${C}┃${RESET}"
+center "${C}┃${RESET}   ${Y}3)${RESET}  Activate ${BOLD}wg2${RESET}                      ${C}┃${RESET}"
+center "${C}┃${RESET}   ${R}4)${RESET}  Disconnect Active Tunnel             ${C}┃${RESET}"
+center "${C}┃${RESET}   ${G}5)${RESET}  Exit Manager                         ${C}┃${RESET}"
+center "${C}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${RESET}"
+echo -e "\n"
+center "${W}${BOLD}󰄾 Select an Option${RESET}"
+echo -ne "                                > "
+read -r choice
+
+# --- PRE-ACTION IP CHECK ---
+OLD_IP=$(get_ip)
+[ -z "$OLD_IP" ] && OLD_IP="Offline"
+
+case $choice in
+    1|2|3) IFACE="wg$((choice-1))" ;;
+    4)
+        ACTIVE_INTERFACES=$(sudo wg show interfaces)
+        if [ -n "$ACTIVE_INTERFACES" ]; then
+            for ACTIVE in $ACTIVE_INTERFACES; do
+                center "${R}󰒄 Deactivating $ACTIVE...${RESET}"
+                sudo wg-quick down "$ACTIVE"
+            done
+
+            sleep 1.5
+            NEW_IP=$(get_ip)
+            [ -z "$NEW_IP" ] && NEW_IP="Offline"
+
+            notify-send "󰒄 WireGuard Disconnected" "Tunnels are down."
+            if [ "$OLD_IP" != "$NEW_IP" ]; then
+                notify-send -u normal "󰩠 IP Address Changed" "$OLD_IP ➔ $NEW_IP"
+            fi
+        fi
+        exit 0 ;;
+    5) exit 0 ;;
+    *) exit 1 ;;
+esac
+
+# --- EXECUTION ---
+ACTIVE_INTERFACES=$(sudo wg show interfaces)
+if [ -n "$ACTIVE_INTERFACES" ]; then
+    for CURRENT in $ACTIVE_INTERFACES; do
+        center "${Y}󱊔 Switching from $CURRENT...${RESET}"
+        sudo wg-quick down "$CURRENT"
+    done
+fi
+
+center "${C}󱑔 Handshaking $IFACE...${RESET}"
+
+if sudo wg-quick up "$IFACE"; then
+    center "${C}󰄬 Verifying Connection...${RESET}"
+    sleep 2 # Give the network a moment to route traffic through the new tunnel
+
+    NEW_IP=$(get_ip)
+    [ -z "$NEW_IP" ] && NEW_IP="Unknown/Offline"
+    LOCATION=$(get_location)
+
+    notify-send "󰒘 WireGuard $IFACE Active" "Location: $LOCATION"
+
+    # Trigger IP change notification if it's different
+    if [ "$OLD_IP" != "$NEW_IP" ]; then
+        notify-send -u normal "󰩠 IP Address Changed" "$OLD_IP ➔ $NEW_IP"
+    fi
+
+    center "${G}󰄬 Done!${RESET}"
+    sleep 0.5
+    exit 0
+else
+    notify-send -u critical "Error" "Failed to start $IFACE"
+    exit 1
+fi

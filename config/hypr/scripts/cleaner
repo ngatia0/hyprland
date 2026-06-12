@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Directories to scan for leftover app data
+CONFIG_DIRS=("$HOME/.config" "$HOME/.local/share")
+
+echo "🔍 Scanning for potential leftover app folders..."
+echo "⚠️  CRITICAL WARNING: Folder names often differ from package names!"
+echo "⚠️  (e.g., the package 'discord' might just use a folder called 'discordapp')."
+echo "⚠️  If you are not 100% sure what a folder is, press 'N' to skip it."
+echo "------------------------------------------------------------------"
+
+for base_dir in "${CONFIG_DIRS[@]}"; do
+    # Skip if directory doesn't exist
+    if [ ! -d "$base_dir" ]; then continue; fi
+
+    for folder in "$base_dir"/*; do
+        if [ -d "$folder" ]; then
+            app_name=$(basename "$folder")
+
+            # Check if the exact folder name exists as an installed pacman package
+            if ! pacman -Qq "$app_name" > /dev/null 2>&1; then
+                echo -ne "\n❓ '$app_name' is NOT currently installed via pacman.\n   Delete $folder? (y/N): "
+                read -r confirm
+                if [[ "$confirm" == [yY] || "$confirm" == [yY][eE][sS] ]]; then
+                    rm -rf "$folder"
+                    echo "🗑️  Deleted: $folder"
+                else
+                    echo "⏭️  Skipped."
+                fi
+            fi
+        fi
+    done
+done
+
+echo -e "\n✅ Scan complete. Your home directory is a bit cleaner!"

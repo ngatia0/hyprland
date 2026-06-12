@@ -1,0 +1,9 @@
+[Unit]
+Description=Weekly System Clean Script
+
+[Service]
+ExecStart=%h/.config/hypr/scripts/clean-system
+Type=oneshot
+
+[Install]
+WantedBy=default.target

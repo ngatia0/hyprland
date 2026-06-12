@@ -1,0 +1,13 @@
+[Unit]
+Description=Run System Clean on Boot and Weekly
+
+[Timer]
+# This triggers the script 15 seconds after the user session starts
+OnStartupSec=15s
+
+# This keeps the Sunday midnight schedule active
+OnCalendar=Sun *-*-* 00:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

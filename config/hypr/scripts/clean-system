@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Function to check if a process is running
+check_running() {
+    pgrep -x "$1" > /dev/null
+}
+
+echo "--- Starting Arch Deep Clean (Vivaldi Optimized) ---"
+
+# Get starting disk space (available KB)
+START_SPACE=$(df /home --output=avail | awk 'NR==2 {print $1}')
+
+# 1. Advanced Package Cache Cleaning
+echo "[*] Cleaning Pacman/AUR Caches..."
+# Keep only the last 3 versions of packages for safety
+if command -v paccache &> /dev/null; then
+    sudo paccache -rk3
+    # Also clean uninstalled package cache (keep none)
+    sudo paccache -ruk0
+else
+    sudo pacman -Sc --noconfirm
+fi
+
+if command -v paru &> /dev/null; then
+    # -Sc for paru clears the build files and the clone directories
+    paru -Sc --cleanafter --clean --noconfirm
+fi
+
+# 2. Vivaldi Smart Cache (Safe Purge)
+echo "[*] Cleaning Vivaldi Web Cache..."
+if ! check_running "vivaldi-bin" && ! check_running "vivaldi"; then
+    V_CACHE="$HOME/.cache/vivaldi/Default"
+    if [ -d "$V_CACHE" ]; then
+        rm -rf "$V_CACHE/Cache"/* 2>/dev/null
+        rm -rf "$V_CACHE/Code Cache"/* 2>/dev/null
+        rm -rf "$V_CACHE/Service Worker/CacheStorage"/* 2>/dev/null
+        echo "  -> Vivaldi web cache cleared."
+    else
+        echo "  -> Vivaldi cache directory not found."
+    fi
+else
+    echo "  [!] Vivaldi is running. Skipping."
+fi
+
+# 3. User Cache & Orphans
+echo "[*] Cleaning Thumbnails & Orphans..."
+find ~/.cache/thumbnails/ -mindepth 1 -delete 2>/dev/null
+
+ORPHANS=$(pacman -Qdtq)
+if [ -n "$ORPHANS" ]; then
+    sudo pacman -Rs $ORPHANS --noconfirm
+else
+    echo "  -> No orphan packages found."
+fi
+
+# 4. System Maintenance (Logs & Firmware)
+echo "[*] Trimming Logs & Firmware Cache..."
+sudo journalctl --vacuum-time=2d
+
+# Clean fwupd metadata if it exists
+if command -v fwupdmgr &> /dev/null; then
+    sudo fwupdmgr clean 2>/dev/null
+fi
+
+# Calculate Space Saved
+END_SPACE=$(df /home --output=avail | awk 'NR==2 {print $1}')
+DIFF=$(( (END_SPACE - START_SPACE) / 1024 ))
+
+if [ "$DIFF" -le 0 ]; then
+    MSG="System was already clean!"
+else
+    MSG="Recovered ${DIFF}MB of disk space."
+fi
+
+# Notification Logic
+if [ "$USER" = "root" ]; then
+    REAL_USER=$(logname || echo $SUDO_USER)
+    sudo -u "$REAL_USER" DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u "$REAL_USER")/bus notify-send "System Cleaned" "$MSG"
+else
+    notify-send "System Cleaned" "$MSG"
+fi
+
+echo "--- $MSG ---"
