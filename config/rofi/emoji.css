@@ -1,0 +1,46 @@
+
+window {
+    margin: 0px;
+    border: 2px solid #ffa6d9;
+    background-color: rgba(15, 9, 20, 0.7); /* Your 0.7 opacity violet */
+    border-radius: 12px;
+    font-family: "monospace";
+    font-size: 16px;
+}
+
+#outer-box {
+    margin: 10px;
+    border: none;
+}
+
+#input {
+    margin: 5px;
+    border: none;
+    color: #ffa6d9;
+    background-color: #26233a; /* Darker violet for input */
+    border-radius: 6px;
+}
+
+#inner-box {
+    margin: 5px;
+    border: none;
+}
+
+#scroll {
+    margin: 0px;
+    border: none;
+}
+
+#text {
+    margin: 5px;
+    color: #ffa6d9; /* Your Pink text */
+}
+
+#entry:selected {
+    background-color: #ffa6d9; /* Pink background on selection */
+    border-radius: 6px;
+}
+
+#text:selected {
+    color: #0f0914; /* Dark violet text when highlighted */
+}

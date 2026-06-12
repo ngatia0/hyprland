@@ -1,0 +1,37 @@
+@define-color bg rgba({{background | rgb}}, 0.7);
+@define-color fg {{foreground}};
+@define-color pink {{color4}};
+@define-color cyan {{color6}};
+@define-color yellow {{color3}};
+@define-color red {{color1}};
+@define-color accent {{color5}};
+
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 13px;
+}
+
+window#bar {
+    background-color: @bg;
+    border-bottom: 2px solid @pink;
+    color: @fg;
+}
+
+.module {
+    padding: 0 10px;
+    margin: 0 5px;
+}
+
+.workspace-button {
+    color: {{color8}};
+}
+
+.workspace-button.active {
+    color: @pink;
+    text-shadow: 0 0 5px @pink;
+}
+
+.network-icon { color: @cyan; }
+.audio-icon   { color: @accent; }
+.battery-icon { color: {{color2}}; }
+.cpu-icon     { color: @yellow; }

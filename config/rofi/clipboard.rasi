@@ -1,0 +1,20 @@
+// Config //
+configuration {
+    show-icons:                  false;
+    modi: "drun,run,window";
+    /* This is the line you need: */
+    kb-cancel: "Escape";
+    font:                        "JetBrainsMono Nerd Font 9";
+    me-select-entry: "";
+     me-accept-entry: "MousePrimary";
+    //me-accept-entry: "!\nMousePrimary";
+    kb-cancel: "MousePrimary";
+
+    /* Natural scrolling */
+    ml-row-up: "ScrollDown";
+    ml-row-down: "ScrollUp";
+
+}
+
+@theme "~/.config/rofi/clipboard-theme.rasi"
+

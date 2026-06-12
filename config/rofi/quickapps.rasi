@@ -1,0 +1,27 @@
+// Config //
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    /* This is the line you need: */
+    kb-cancel: "Escape";
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+    kb-cancel: "MousePrimary";
+
+
+    /* Natural scrolling */
+    ml-row-up: "ScrollDown";
+    ml-row-down: "ScrollUp";
+
+}
+
+@theme "~/.config/rofi/style_2.rasi"
+
+
+// Main //
+window {
+    transparency:                "real";
+    fullscreen:                  false;
+    enabled:                     true;
+    cursor:                      "default";
+}
