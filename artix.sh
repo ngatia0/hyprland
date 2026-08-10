@@ -31,8 +31,8 @@ read -p "    Press Enter to launch cfdisk..." _ && cfdisk "$DISK"
 
 # Handle partition suffix (p for nvme)
 P=; [[ "$DISK" == *"nvme"* ]] && P="p"
-EFI="${DISK}${P}1"
-ROOT="${DISK}${P}2"
+EFI="${DISK}${P}2"
+ROOT="${DISK}${P}3"
 
 sudo pacman -Sy f2fs-tools dosfstools
 
