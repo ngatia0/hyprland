@@ -11,11 +11,11 @@ HOSTNAME="archiso"
 DISK="/dev/sda"
 
 if [[ "$DISK" == *nvme* || "$DISK" == *mmcblk* ]]; then
-  EFI_DEV="${DISK}p1"
-  ROOT_DEV="${DISK}p2"
+  EFI_DEV="${DISK}p2"
+  ROOT_DEV="${DISK}p3"
 else
-  EFI_DEV="${DISK}1"
-  ROOT_DEV="${DISK}2"
+  EFI_DEV="${DISK}2"
+  ROOT_DEV="${DISK}3"
 fi
 
 echo "== Starting Arch Linux Installation for $USERNAME =="
