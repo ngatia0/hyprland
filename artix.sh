@@ -45,13 +45,13 @@ echo "[+] Mounting filesystems..."
 mount -t f2fs -o noatime,lazytime,background_gc=sync,gc_merge,atgc,compress_algorithm=lz4,compress_chksum,errors=remount-ro "$ROOT" /mnt
 
 
-mkdir -p /mnt/boot/efi
-mount "$EFI" /mnt/boot/efi
+mkdir -p /mnt/boot
+mount "$EFI" /mnt/boot
 
 # Base install
 echo "[+] Installing base system..."
 basestrap -i /mnt base base-devel linux linux-firmware grub \
-  networkmanager networkmanager-runit runit elogind-runit git \
+  networkmanager nano networkmanager-runit runit elogind-runit git \
   efibootmgr bash-completion sudo runit-rc intel-ucode f2fs-tools dosfstools
 
 fstabgen -U /mnt >> /mnt/etc/fstab
@@ -104,7 +104,7 @@ echo "[+] Installing liked packages..."
 pacman -S --noconfirm neofetch
 
 echo "[+] Installing GRUB bootloader..."
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
 echo "[✓] Setup complete inside chroot."
