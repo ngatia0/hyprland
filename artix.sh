@@ -38,7 +38,7 @@ sudo pacman -Sy f2fs-tools dosfstools
 
 echo "[+] Formatting partitions..."
 mkfs.fat -F32 "$EFI"
-mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,inode_crtime,sb_checksum,compression "$ROOT"
+mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,sb_checksum,compression "$ROOT"
 
 echo "[+] Mounting filesystems..."
 
