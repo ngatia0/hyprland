@@ -42,7 +42,7 @@ mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,inode_crtime,sb_checksum,compr
 
 echo "[+] Mounting filesystems..."
 
-mount -t f2fs -o defaults,rw,noatime,lazytime,background_gc=sync,gc_merge,atgc,compress_algorithm=lz4:3,compress_chksum,fsync_mode=strict "$ROOT" /mnt
+mount -t f2fs -o defaults,rw,noatime,lazytime,background_gc=sync,gc_merge,atgc,compress_algorithm=lz4:3,compress_chksum "$ROOT" /mnt
 
 
 mkdir -p /mnt/boot
