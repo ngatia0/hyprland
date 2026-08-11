@@ -14,14 +14,7 @@ if [ "$CURRENT_STATE" = "1" ]; then
     sudo bash -c 'echo -e "\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch" >> /etc/pacman.conf'
     sudo pacman -Syu --noconfirm
 
-    sudo pacman -S --noconfirm zramen zramen-runit
-    sudo tee /etc/zramen.conf << 'EOT'
-ZRAM_SIZE=50%
-ZRAM_ALGO=lz4
-PRIORITY=100
-EOT
-    sudo ln -sf /etc/sv/zramen /var/service/
-    sudo sv restart zramen
+    
 
     echo "kvnx ALL=(ALL) NOPASSWD: /usr/bin/pacman, /usr/bin/paru" | sudo tee /etc/sudoers.d/pacman-paru && sudo chmod 440 /etc/sudoers.d/pacman-paru
 
