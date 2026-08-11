@@ -48,6 +48,9 @@ alloc_mode=default,checkpoint_merge,compress_algorithm=lz4:3,\
 compress_chksum,atgc,errors=remount-ro,lookup_mode=auto,lazytime,\
 inline_xattr "$ROOT" /mnt
 
+mount -t f2fs -o rw,noatime,background_gc=sync,gc_merge,atgc,compress_algorithm=lz4,compress_chksum,errors=remount-ro "$ROOT" /mnt
+
+
 mkdir -p /mnt/boot/efi
 mount "$EFI" /mnt/boot/efi
 
