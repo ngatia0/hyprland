@@ -30,14 +30,14 @@ read -p "    Press Enter to launch cfdisk..." _ && cfdisk "$DISK"
 
 # Handle partition suffix (p for nvme)
 P=; [[ "$DISK" == *"nvme"* ]] && P="p"
-ISO_PART="${DISK}${P}1"
-EFI="${DISK}${P}2"
-ROOT="${DISK}${P}3"
+#ISO_PART="${DISK}${P}1"
+EFI="${DISK}${P}1"
+ROOT="${DISK}${P}2"
 
 sudo pacman -Sy f2fs-tools dosfstools btrfs-progs
 
 echo "[+] Formatting partitions..."
-mkfs.btrfs -f -L ISO "$ISO_PART"
+#mkfs.btrfs -f -L ISO "$ISO_PART"
 mkfs.fat -F32 "$EFI"
 fatlabel "$EFI" ESP
 mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,sb_checksum,compression "$ROOT"
@@ -47,9 +47,9 @@ echo "[+] Mounting filesystems..."
 mount -t f2fs -o defaults,rw,noatime,lazytime,background_gc=on,gc_merge,atgc,compress_algorithm=lz4:3,compress_chksum "$ROOT" /mnt
 
 
-mkdir -p /mnt/boot /mnt/iso
+mkdir -p /mnt/boot
 mount "$EFI" /mnt/boot
-mount -t btrfs -o noatime,compress=zstd "$ISO_PART" /mnt/iso
+#mount -t btrfs -o noatime,compress=zstd "$ISO_PART" /mnt/iso
 
 # Base install
 echo "[+] Installing base system..."
