@@ -82,6 +82,7 @@ sed -i '/en_US.UTF-8 UTF-8/s/^#//' /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
+echo "KEYMAP=us" > /etc/vconsole.conf
 echo "archiso" > /etc/hostname
 cat <<EOL > /etc/hosts
 127.0.0.1       localhost
