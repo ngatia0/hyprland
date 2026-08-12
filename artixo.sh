@@ -110,7 +110,7 @@ echo "[+] Installing liked packages..."
 pacman -S --noconfirm neofetch
 
 echo "[+] Installing GRUB bootloader..."
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ARTIXO
 grub-mkconfig -o /boot/grub/grub.cfg
 
 echo "[✓] Setup complete inside chroot."
