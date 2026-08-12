@@ -80,9 +80,9 @@ pacman -Sy --noconfirm
 ln -sf /usr/share/zoneinfo/Africa/Nairobi /etc/localtime
 hwclock --systohc
 
-sed -i '/en_US.UTF-8 UTF-8/s/^#//' /etc/locale.gen
+sed -i '/en_GB.UTF-8 UTF-8/s/^#//' /etc/locale.gen
 locale-gen
-echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo "LANG=en_GB.UTF-8" > /etc/locale.conf
 
 echo "KEYMAP=us" > /etc/vconsole.conf
 echo "archiso" > /etc/hostname
@@ -99,7 +99,7 @@ FILES=()
 HOOKS=(base systemd autodetect modconf kms sd-vconsole block filesystems fsck)
 EOT
 
-mkinitcpio -P
+sudo mkinitcpio -P
 
 
 echo "[+] Setting root password..."
