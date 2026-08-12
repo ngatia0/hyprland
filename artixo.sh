@@ -96,7 +96,7 @@ cat << EOT > /etc/mkinitcpio.conf
 MODULES=(f2fs i915)
 BINARIES=()
 FILES=()
-HOOKS=(base systemd autodetect modconf kms sd-vconsole block filesystems fsck)
+HOOKS=(base autodetect modconf kms block filesystems fsck)
 EOT
 
 sudo mkinitcpio -P
