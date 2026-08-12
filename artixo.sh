@@ -92,6 +92,16 @@ cat <<EOL > /etc/hosts
 127.0.1.1       archiso.localdomain archiso
 EOL
 
+cat << EOT > /etc/mkinitcpio.conf
+MODULES=(f2fs i915)
+BINARIES=()
+FILES=()
+HOOKS=(base systemd autodetect modconf kms sd-vconsole block filesystems fsck)
+EOT
+
+mkinitcpio -P
+
+
 echo "[+] Setting root password..."
 echo "root:$ROOTPASS" | chpasswd
 
