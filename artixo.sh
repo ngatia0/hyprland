@@ -39,6 +39,7 @@ sudo pacman -Sy f2fs-tools dosfstools btrfs-progs
 echo "[+] Formatting partitions..."
 mkfs.btrfs -f -L ISO "$ISO_PART"
 mkfs.fat -F32 "$EFI"
+fatlabel "$EFI" ESP
 mkfs.f2fs -f -l ROOT -O extra_attr,inode_checksum,sb_checksum,compression "$ROOT"
 
 echo "[+] Mounting filesystems..."
