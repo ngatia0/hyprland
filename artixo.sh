@@ -58,6 +58,8 @@ basestrap -i /mnt base base-devel linux-zen linux-zen-headers linux-firmware gru
   efibootmgr bash-completion sudo runit-rc connman-runit connman-gtk chrony openntpd intel-ucode f2fs-tools dosfstools btrfs-progs
 
 fstabgen -U /mnt >> /mnt/etc/fstab
+cat /mnt/etc/fstab
+sleep 4
 
 # Get user info
 read -s -p "[?] Enter root password: " ROOTPASS && echo
