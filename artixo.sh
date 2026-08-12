@@ -55,7 +55,7 @@ mount -t btrfs -o noatime,compress=zstd "$ISO_PART" /mnt/iso
 echo "[+] Installing base system..."
 basestrap -i /mnt base base-devel linux-zen linux-zen-headers linux-firmware grub \
   networkmanager nano networkmanager-runit runit elogind-runit git \
-  efibootmgr bash-completion sudo runit-rc chrony openntpd intel-ucode f2fs-tools dosfstools btrfs-progs
+  efibootmgr bash-completion sudo runit-rc connman-runit connman-gtk chrony openntpd intel-ucode f2fs-tools dosfstools btrfs-progs
 
 fstabgen -U /mnt >> /mnt/etc/fstab
 
