@@ -1,0 +1,1103 @@
+-- Hyprland Lua configuration
+-- Converted from your existing hyprland.conf
+-- Official Lua configuration syntax:
+-- https://wiki.hypr.land/Configuring/Start/
+
+------------------
+---- PROGRAMS ----
+------------------
+
+local terminal    = "foot"
+local fileManager = "thunar"
+local browser     = "google-chrome-beta"
+local mainMod     = "SUPER"
+local userMod     = "CTRL"
+
+------------------
+---- MONITORS ----
+------------------
+
+hl.monitor({
+    output   = "eDP-1",
+    mode     = "2560x1440@60.05",
+    position = "auto",
+    scale    = 1.60,
+    bitdepth = 10,
+})
+
+---------------------
+---- WORKSPACES ----
+---------------------
+
+hl.workspace_rule({
+    workspace = "1",
+    monitor = "eDP-1",
+    persistent = true,
+})
+
+hl.workspace_rule({
+    workspace = "2",
+    monitor = "eDP-1",
+    persistent = true,
+})
+
+hl.workspace_rule({
+    workspace = "3",
+    monitor = "eDP-1",
+    persistent = true,
+})
+
+hl.workspace_rule({
+    workspace = "4",
+    monitor = "eDP-1",
+    persistent = true,
+})
+
+-------------------
+---- AUTOSTART ----
+-------------------
+
+hl.on("hyprland.start", function()
+    hl.exec_cmd("dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DBUS_SESSION_BUS_ADDRESS")
+    hl.exec_cmd("~/.config/hypr/scripts/audio.sh &")
+    hl.exec_cmd('sh -c "sudo ~/.config/hypr/scripts/resolv &"')
+
+    hl.exec_cmd("/usr/lib/xdg-desktop-portal-hyprland &")
+    hl.exec_cmd("/usr/lib/xdg-desktop-portal-gtk &")
+    hl.exec_cmd("/usr/lib/xdg-desktop-portal &")
+    hl.exec_cmd("/usr/lib/hyprpolkitagent &")
+
+    hl.exec_cmd("hyprpaper &")
+    -- hl.exec_cmd("waybar &")
+    hl.exec_cmd("dunst &")
+    hl.exec_cmd("hypridle &")
+
+    hl.exec_cmd("wl-paste --watch clipvault store --min-entry-length 0 --max-entries 20000 --max-entry-age 5d &")
+    hl.exec_cmd("wl-paste -p --watch wl-copy &")
+
+    hl.exec_cmd('sh -c "sudo dell-bios-fan-control 0"')
+    hl.exec_cmd('sh -c "sudo i8kmon"')
+end)
+
+-------------------------------
+---- ENVIRONMENT VARIABLES ----
+-------------------------------
+
+hl.env("GDK_SCALE", "1")
+hl.env("GDK_BACKEND", "wayland,x11,*")
+hl.env("CLUTTER_BACKEND", "wayland")
+hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
+hl.env("XCURSOR_SIZE", "20")
+hl.env("HYPRCURSOR_THEME", "MyCursor")
+hl.env("HYPRCURSOR_SIZE", "20")
+
+hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
+hl.env("XDG_SESSION_TYPE", "wayland")
+hl.env("XDG_SESSION_DESKTOP", "Hyprland")
+
+-----------------------
+----- PERMISSIONS -----
+-----------------------
+
+hl.config({
+    ecosystem = {
+        enforce_permissions = false,
+    },
+})
+
+hl.permission("/usr/bin/hyprlock", "screencopy", "allow")
+hl.permission("/usr/bin/hypridle", "screencopy", "allow")
+hl.permission(
+    "/usr/(lib|libexec|lib64)/xdg-desktop-portal-hyprland",
+    "screencopy",
+    "allow"
+)
+
+-----------------------
+---- RENDERING --------
+-----------------------
+
+hl.config({
+    render = {
+        direct_scanout = true,
+        ctm_animation = true,
+    },
+})
+
+-----------------------
+---- LOOK AND FEEL ----
+-----------------------
+
+hl.config({
+    general = {
+        gaps_in = 1,
+        gaps_out = 0,
+
+        border_size = 1,
+
+        col = {
+            active_border = {
+                colors = {
+                    "$color1",
+                    "$color3",
+                    "$color5",
+                    "$color7",
+                    "$color8",
+                    "$color10",
+                    "$color12",
+                    "$color14",
+                    "$color2",
+                },
+                angle = 45,
+            },
+
+            inactive_border = "$background",
+        },
+
+        resize_on_border = true,
+        allow_tearing = true,
+
+        layout = "master",
+    },
+})
+
+---------------------
+---- DWINDLE --------
+---------------------
+
+hl.config({
+    dwindle = {
+        force_split = 2,
+        preserve_split = true,
+        smart_split = false,
+        use_active_for_splits = true,
+        default_split_ratio = 1.0,
+        split_bias = 1,
+        split_width_multiplier = 1.2,
+        smart_resizing = false,
+        precise_mouse_move = false,
+    },
+})
+
+---------------------
+---- MASTER ---------
+---------------------
+
+hl.config({
+    master = {
+        orientation = "left",
+        mfact = 0.52,
+        new_status = "slave",
+        new_on_top = false,
+        new_on_active = "none",
+        allow_small_split = false,
+        smart_resizing = false,
+        drop_at_cursor = false,
+        always_keep_position = false,
+    },
+})
+
+----------------------
+---- ANIMATIONS ------
+----------------------
+
+hl.config({
+    animations = {
+        enabled = true,
+    },
+})
+
+hl.curve("easeOutQuint", {
+    type = "bezier",
+    points = {
+        {0.23, 1},
+        {0.32, 1},
+    },
+})
+
+hl.curve("easeInOutCubic", {
+    type = "bezier",
+    points = {
+        {0.65, 0.05},
+        {0.36, 1},
+    },
+})
+
+hl.curve("linear", {
+    type = "bezier",
+    points = {
+        {0, 0},
+        {1, 1},
+    },
+})
+
+hl.curve("almostLinear", {
+    type = "bezier",
+    points = {
+        {0.5, 0.5},
+        {0.75, 1},
+    },
+})
+
+hl.curve("quick", {
+    type = "bezier",
+    points = {
+        {0.15, 0},
+        {0.1, 1},
+    },
+})
+
+hl.curve("myBezier", {
+    type = "bezier",
+    points = {
+        {0.05, 0.9},
+        {0.1, 1.05},
+    },
+})
+
+hl.animation({
+    leaf = "global",
+    enabled = true,
+    speed = 10,
+    bezier = "default",
+})
+
+hl.animation({
+    leaf = "border",
+    enabled = true,
+    speed = 5.39,
+    bezier = "easeOutQuint",
+})
+
+hl.animation({
+    leaf = "windows",
+    enabled = true,
+    speed = 7,
+    bezier = "myBezier",
+})
+
+hl.animation({
+    leaf = "windowsIn",
+    enabled = true,
+    speed = 4.1,
+    bezier = "easeOutQuint",
+    style = "popin 87%",
+})
+
+hl.animation({
+    leaf = "windowsOut",
+    enabled = true,
+    speed = 1.49,
+    bezier = "linear",
+    style = "popin 87%",
+})
+
+hl.animation({
+    leaf = "fadeIn",
+    enabled = true,
+    speed = 1.73,
+    bezier = "almostLinear",
+})
+
+hl.animation({
+    leaf = "fadeOut",
+    enabled = true,
+    speed = 1.46,
+    bezier = "almostLinear",
+})
+
+hl.animation({
+    leaf = "fade",
+    enabled = true,
+    speed = 3.03,
+    bezier = "quick",
+})
+
+hl.animation({
+    leaf = "layers",
+    enabled = true,
+    speed = 3.81,
+    bezier = "easeOutQuint",
+})
+
+hl.animation({
+    leaf = "layersIn",
+    enabled = true,
+    speed = 4,
+    bezier = "easeOutQuint",
+    style = "fade",
+})
+
+hl.animation({
+    leaf = "layersOut",
+    enabled = true,
+    speed = 1.5,
+    bezier = "linear",
+    style = "fade",
+})
+
+hl.animation({
+    leaf = "fadeLayersIn",
+    enabled = true,
+    speed = 1.79,
+    bezier = "almostLinear",
+})
+
+hl.animation({
+    leaf = "fadeLayersOut",
+    enabled = true,
+    speed = 1.39,
+    bezier = "almostLinear",
+})
+
+hl.animation({
+    leaf = "workspaces",
+    enabled = true,
+    speed = 1.94,
+    bezier = "almostLinear",
+    style = "fade",
+})
+
+hl.animation({
+    leaf = "workspacesIn",
+    enabled = true,
+    speed = 1.21,
+    bezier = "almostLinear",
+    style = "fade",
+})
+
+hl.animation({
+    leaf = "workspacesOut",
+    enabled = true,
+    speed = 1.94,
+    bezier = "almostLinear",
+    style = "fade",
+})
+
+hl.animation({
+    leaf = "zoomFactor",
+    enabled = true,
+    speed = 7,
+    bezier = "quick",
+})
+
+--------------------
+---- DECORATION ----
+--------------------
+
+hl.config({
+    decoration = {
+        rounding = 3,
+        rounding_power = 5,
+
+        active_opacity = 1.0,
+        inactive_opacity = 1.0,
+
+        blur = {
+            enabled = false,
+            size = 3,
+            passes = 1,
+            vibrancy = 0.1696,
+            new_optimizations = false,
+            xray = false,
+            ignore_opacity = false,
+        },
+
+        shadow = {
+            enabled = false,
+            offset = "1 2",
+            range = 10,
+            render_power = 4,
+            color = "rgba(1a1a1aee)",
+        },
+    },
+})
+
+----------------
+---- MISC ------
+----------------
+
+hl.config({
+    misc = {
+        force_default_wallpaper = 0,
+        disable_hyprland_logo = false,
+        disable_splash_rendering = false,
+
+        vrr = 2,
+
+        mouse_move_enables_dpms = true,
+
+        enable_swallow = true,
+        swallow_regex = "^(kitty|Alacritty|konsole|wezterm)$",
+
+        focus_on_activate = false,
+        initial_workspace_tracking = 0,
+
+        middle_click_paste = true,
+
+        enable_anr_dialog = true,
+        anr_missed_pings = 15,
+
+        allow_session_lock_restore = true,
+        on_focus_under_fullscreen = 1,
+    },
+})
+
+------------------
+---- XWAYLAND ----
+------------------
+
+hl.config({
+    xwayland = {
+        enabled = true,
+        force_zero_scaling = true,
+    },
+})
+
+----------------
+---- CURSOR ----
+----------------
+
+hl.config({
+    cursor = {
+        sync_gsettings_theme = true,
+        no_hardware_cursors = 2,
+        enable_hyprcursor = true,
+        warp_on_change_workspace = 2,
+        no_warps = true,
+    },
+})
+
+----------------
+---- INPUT ----
+----------------
+
+hl.config({
+    input = {
+        kb_layout = "us",
+        kb_variant = "",
+        kb_model = "",
+        kb_options = "",
+        kb_rules = "",
+
+        repeat_rate = 25,
+        repeat_delay = 200,
+
+        sensitivity = 0.7,
+        numlock_by_default = true,
+        left_handed = false,
+
+        follow_mouse = 1,
+        float_switch_override_focus = false,
+
+        touchpad = {
+            disable_while_typing = true,
+            natural_scroll = true,
+            clickfinger_behavior = false,
+            middle_button_emulation = false,
+            tap_to_click = true,
+            drag_lock = false,
+        },
+
+        touchdevice = {
+            enabled = true,
+        },
+
+        tablet = {
+            transform = 0,
+            left_handed = 0,
+        },
+    },
+})
+
+----------------
+---- GESTURES --
+----------------
+
+hl.gesture({
+    fingers = 3,
+    direction = "horizontal",
+    action = "workspace",
+})
+
+----------------
+---- DEVICES ---
+----------------
+
+hl.device({
+    name = "epic-mouse-v1",
+    sensitivity = -0.5,
+})
+
+----------------
+---- BINDS ----
+----------------
+
+hl.config({
+    binds = {
+        workspace_back_and_forth = true,
+        allow_workspace_cycles = true,
+        pass_mouse_when_bound = false,
+    },
+})
+
+--------------------------
+---- POWER / SYSTEM -----
+--------------------------
+
+hl.bind(
+    mainMod .. " + SHIFT + P",
+    hl.dsp.exec_cmd("systemctl poweroff")
+)
+
+hl.bind(
+    mainMod .. " + SHIFT + R",
+    hl.dsp.exec_cmd("systemctl reboot")
+)
+
+hl.bind(
+    mainMod .. " + U",
+    hl.dsp.exec_cmd("~/.config/hypr/scripts/sudo.sh")
+)
+
+--------------------------
+---- APPLICATIONS --------
+--------------------------
+
+hl.bind(
+    mainMod .. " + B",
+    hl.dsp.exec_cmd(browser)
+)
+
+hl.bind(
+    mainMod .. " + P",
+    hl.dsp.exec_cmd("~/.config/hypr/scripts/phone")
+)
+
+hl.bind(
+    mainMod .. " + K",
+    hl.dsp.exec_cmd("kate")
+)
+
+hl.bind(
+    mainMod .. " + Q",
+    hl.dsp.exec_cmd(terminal)
+)
+
+hl.bind(
+    mainMod .. " + E",
+    hl.dsp.exec_cmd(fileManager)
+)
+
+--------------------------
+---- SCREENSHOTS ----------
+--------------------------
+
+hl.bind(
+    "PRINT",
+    hl.dsp.exec_cmd("hyprshot -m region")
+)
+
+hl.bind(
+    mainMod .. " + PRINT",
+    hl.dsp.exec_cmd("hyprshot -m window -o ~/Pictures/screenshots")
+)
+
+hl.bind(
+    mainMod .. " + SHIFT + PRINT",
+    hl.dsp.exec_cmd("hyprshot -m output -o ~/Pictures/screenshots")
+)
+
+--------------------------
+---- LOCK / RELOAD --------
+--------------------------
+
+hl.bind(
+    mainMod .. " + L",
+    hl.dsp.exec_cmd("hyprlock")
+)
+
+hl.bind(
+    mainMod .. " + R",
+    hl.dsp.exec_cmd("~/.config/hypr/scripts/force-reload.sh")
+)
+
+--------------------------
+---- HYPREMOJI -----------
+--------------------------
+
+hl.bind(
+    mainMod .. " + period",
+    hl.dsp.exec_cmd("hypremoji")
+)
+
+--------------------------
+---- FULLSCREEN -----------
+--------------------------
+
+hl.bind(
+    mainMod .. " + F",
+    hl.dsp.exec_cmd("hyprctl dispatch fullscreen")
+)
+
+--------------------------
+---- FUZZEL --------------
+--------------------------
+
+hl.bind(
+    mainMod .. " + SPACE",
+    hl.dsp.exec_cmd('sh -c "fuzzel; pkill fuzzel"')
+)
+
+--------------------------
+---- WIREGUARD -----------
+--------------------------
+
+hl.bind(
+    mainMod .. " + SHIFT + 6",
+    hl.dsp.exec_cmd(
+        'sh -c \'foot -e sudo nano /etc/wireguard/wg0.conf; exit 1\''
+    )
+)
+
+hl.bind(
+    mainMod .. " + SHIFT + 7",
+    hl.dsp.exec_cmd(
+        'sh -c \'foot -e sudo nano /etc/wireguard/wg1.conf; exit 1\''
+    )
+)
+
+hl.bind(
+    mainMod .. " + SHIFT + 8",
+    hl.dsp.exec_cmd(
+        'sh -c \'foot -e sudo nano /etc/wireguard/wg2.conf; exit 1\''
+    )
+)
+
+hl.bind(
+    mainMod .. " + 6",
+    hl.dsp.exec_cmd(
+        "sh -c 'IFACE=wg0 ~/.config/hypr/scripts/wireguard.sh'"
+    )
+)
+
+hl.bind(
+    mainMod .. " + 7",
+    hl.dsp.exec_cmd(
+        "sh -c 'IFACE=wg1 ~/.config/hypr/scripts/wireguard.sh'"
+    )
+)
+
+hl.bind(
+    mainMod .. " + 8",
+    hl.dsp.exec_cmd(
+        "sh -c 'IFACE=wg2 ~/.config/hypr/scripts/wireguard.sh'"
+    )
+)
+
+--------------------------
+---- MAIN WINDOW ----------
+--------------------------
+
+hl.bind(
+    mainMod .. " + G",
+    hl.dsp.toggles_group()
+)
+
+hl.bind(
+    mainMod .. " + C",
+    hl.dsp.window.close()
+)
+
+hl.bind(
+    mainMod .. " + V",
+    hl.dsp.window.float({
+        action = "toggle",
+    })
+)
+
+hl.bind(
+    mainMod .. " + SHIFT + P",
+    hl.dsp.window.pseudo()
+)
+
+--------------------------
+---- AUDIO ---------------
+--------------------------
+
+hl.bind(
+    "XF86AudioRaiseVolume",
+    hl.dsp.exec_cmd(
+        "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 1%+"
+    ),
+    {
+        locked = true,
+        repeating = true,
+    }
+)
+
+hl.bind(
+    "XF86AudioLowerVolume",
+    hl.dsp.exec_cmd(
+        "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"
+    ),
+    {
+        locked = true,
+        repeating = true,
+    }
+)
+
+hl.bind(
+    "XF86AudioMute",
+    hl.dsp.exec_cmd(
+        "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+    ),
+    {
+        locked = true,
+        repeating = true,
+    }
+)
+
+--------------------------
+---- BRIGHTNESS -----------
+--------------------------
+
+hl.bind(
+    "XF86MonBrightnessUp",
+    hl.dsp.exec_cmd(
+        "brightnessctl -d intel_backlight set +1%"
+    ),
+    {
+        locked = true,
+        repeating = true,
+    }
+)
+
+hl.bind(
+    "XF86MonBrightnessDown",
+    hl.dsp.exec_cmd(
+        "brightnessctl -d intel_backlight set 1%-"
+    ),
+    {
+        locked = true,
+        repeating = true,
+    }
+)
+
+hl.bind(
+    "SHIFT + up",
+    hl.dsp.exec_cmd(
+        "bash -c 'brightnessctl -d intel_backlight set +1% && val=$(brightnessctl -d intel_backlight get); percent=$((val * 100 / 937)); notify-send -h string:x-canonical-private-synchronous:brightness \"Brightness\" \"${percent}%\"'"
+    ),
+    {
+        repeating = true,
+    }
+)
+
+hl.bind(
+    "SHIFT + down",
+    hl.dsp.exec_cmd(
+        "bash -c 'brightnessctl -d intel_backlight set 1%- && val=$(brightnessctl -d intel_backlight get); percent=$((val * 100 / 937)); notify-send -h string:x-canonical-private-synchronous:brightness \"Brightness\" \"${percent}%\"'"
+    ),
+    {
+        repeating = true,
+    }
+)
+
+--------------------------
+---- MEDIA ----------------
+--------------------------
+
+hl.bind(
+    "XF86AudioNext",
+    hl.dsp.exec_cmd("playerctl next"),
+    { locked = true }
+)
+
+hl.bind(
+    "XF86AudioPause",
+    hl.dsp.exec_cmd("playerctl play-pause"),
+    { locked = true }
+)
+
+hl.bind(
+    "XF86AudioPlay",
+    hl.dsp.exec_cmd("playerctl play-pause"),
+    { locked = true }
+)
+
+hl.bind(
+    "XF86AudioPrev",
+    hl.dsp.exec_cmd("playerctl previous"),
+    { locked = true }
+)
+
+--------------------------
+---- MOUSE ----------------
+--------------------------
+
+hl.bind(
+    mainMod .. " + mouse:272",
+    hl.dsp.window.drag(),
+    { mouse = true }
+)
+
+hl.bind(
+    mainMod .. " + mouse:273",
+    hl.dsp.window.resize(),
+    { mouse = true }
+)
+
+--------------------------
+---- LID ------------------
+--------------------------
+
+hl.bind(
+    "switch:on:Lid Switch",
+    hl.dsp.exec_cmd("hyprlock")
+)
+
+hl.bind(
+    "switch:on:Lid Switch",
+    hl.dsp.exec_cmd("hyprctl dispatch dpms off eDP-1")
+)
+
+hl.bind(
+    "switch:off:Lid Switch",
+    hl.dsp.exec_cmd("hyprctl dispatch dpms on eDP-1")
+)
+
+hl.bind(
+    "switch:on:Lid Switch",
+    hl.dsp.exec_cmd(
+        'notify-send "Lid Event" "Lid Closed (Signal Sent)" --icon=lock'
+    )
+)
+
+hl.bind(
+    "switch:off:Lid Switch",
+    hl.dsp.exec_cmd(
+        'notify-send "Lid Event" "Lid Opened (Signal Sent)" --icon=unlock'
+    )
+)
+
+--------------------------
+---- SPECIAL WORKSPACE ----
+--------------------------
+
+hl.bind(
+    mainMod .. " + M",
+    hl.dsp.workspace.toggle_special("magic")
+)
+
+hl.bind(
+    mainMod .. " + X",
+    hl.dsp.window.move({
+        workspace = "special:magic",
+    })
+)
+
+--------------------------
+---- WORKSPACE SCROLL ----
+--------------------------
+
+hl.bind(
+    mainMod .. " + mouse_down",
+    hl.dsp.focus({
+        workspace = "e+1",
+    })
+)
+
+hl.bind(
+    mainMod .. " + mouse_up",
+    hl.dsp.focus({
+        workspace = "e-1",
+    })
+)
+
+--------------------------
+---- FOCUS ----------------
+--------------------------
+
+hl.bind(
+    mainMod .. " + left",
+    hl.dsp.focus({
+        direction = "left",
+    })
+)
+
+hl.bind(
+    mainMod .. " + right",
+    hl.dsp.focus({
+        direction = "right",
+    })
+)
+
+hl.bind(
+    mainMod .. " + up",
+    hl.dsp.focus({
+        direction = "up",
+    })
+)
+
+hl.bind(
+    mainMod .. " + down",
+    hl.dsp.focus({
+        direction = "down",
+    })
+)
+
+--------------------------
+---- WORKSPACES -----------
+--------------------------
+
+for i = 1, 4 do
+    hl.bind(
+        mainMod .. " + " .. i,
+        hl.dsp.focus({
+            workspace = i,
+        })
+    )
+
+    hl.bind(
+        mainMod .. " + SHIFT + " .. i,
+        hl.dsp.window.move({
+            workspace = i,
+        })
+    )
+end
+
+--------------------------
+---- GESTURE ZOOM ---------
+--------------------------
+
+hl.gesture({
+    fingers = 4,
+    direction = "up",
+    action = "dispatcher",
+})
+
+-----------------------------
+---- LAYER / WINDOW RULES ---
+-----------------------------
+
+hl.window_rule({
+    name = "vpn-menu-overlay",
+
+    match = {
+        class = "org.kde.konsole",
+        initial_class = "org.kde.konsole",
+    },
+
+    float = true,
+    size = "600 350",
+    move = "(monitor_w * 0.5 - 300) 10",
+
+    center = false,
+
+    idle_inhibit = "always",
+    rounding = 10,
+    dim_around = true,
+    border_size = 2,
+    xray = true,
+})
+
+hl.window_rule({
+    name = "suppress-maximize-events",
+
+    match = {
+        class = ".*",
+    },
+
+    suppress_event = "maximize",
+})
+
+hl.window_rule({
+    name = "no-focus-empty-xwayland",
+
+    match = {
+        class = "^$",
+        title = "^$",
+        xwayland = true,
+        float = true,
+    },
+
+    no_focus = true,
+})
+
+--------------------------
+---- HYPRLAND RUN ---------
+--------------------------
+
+hl.window_rule({
+    name = "hyprland-run",
+
+    match = {
+        class = "^(hyprland-run)$",
+    },
+
+    float = true,
+    move = "(monitor_w-120) 20",
+})
+
+--------------------------
+---- HYPREMOJI ------------
+--------------------------
+
+hl.window_rule({
+    name = "hypremoji",
+
+    match = {
+        class = "^(dev%.musagy%.hypremoji)$",
+    },
+
+    float = true,
+    center = true,
+    border_size = 1,
+})
+
+--------------------------
+---- XWAYLAND BRIDGE -------
+--------------------------
+
+hl.window_rule({
+    name = "xwayland-bridge-fix",
+
+    match = {
+        class = "^(xwaylandvideobridge)$",
+    },
+
+    no_initial_focus = true,
+    no_focus = true,
+    no_anim = true,
+    no_blur = true,
+
+    opacity = "0.0 override 0.0 override",
+
+    workspace = "special:magic",
+})
+
+--------------------------
+---- OPTIONAL -------------
+--------------------------
+
+-- Wallust:
+-- Your old config used:
+--
+-- source = ~/.config/hypr/wallust/wallust-hyprland.conf
+--
+-- The Lua config cannot directly use the old `source =` syntax.
+-- If wallust-hyprland.conf only defines `$color1`, `$color3`, etc.,
+-- those values need to be exposed to Lua separately.
+
+-- Optional Wallpaper Engine:
+--
+-- hl.on("hyprland.start", function()
+--     hl.exec_cmd("swww-daemon --format argb &")
+--     hl.exec_cmd(
+--         "while true; do " ..
+--         "swww img $(find ~/Pictures/wallpapers -type f | shuf -n 1) " ..
+--         "--transition-type random --transition-step 30; " ..
+--         "sleep 600; done &"
+--     )
+-- end)
